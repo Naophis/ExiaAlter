@@ -6,3 +6,4 @@ gen_code/
 *.slxc
 *.mexw64
 slprj/
+RUN_MODE.m
