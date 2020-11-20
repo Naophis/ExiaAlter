@@ -314,8 +314,7 @@ char runForKnownPath(float max, float ac, float diac) {
 					if (dist >= 1) {
 						check = realRun(max, ac, diac, dist * 180 - 90,
 								slaVelocity, NULL_FILTER);
-						check = runForWallOff(slaVelocity, ac, 90, 1,
-						NULL_FILTER);
+						check = runForWallOff(slaVelocity, ac, 90, 1);
 					} else {
 						check = realRun(max, ac, diac, dist * 180, slaVelocity,
 						NULL_FILTER);

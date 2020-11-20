@@ -469,7 +469,6 @@ void readVelocityGain() {
 	Vel.Kp = Vkp;
 	Vel.Ki = Vki;
 	Vel.Kd = Vkd;
-//	myprintf("%f	%f	%f\r\n", Vel.Kp, Vel.Ki, Vel.Kd);
 }
 void resetVelocityGain() {
 	Vel.Kp = 0;

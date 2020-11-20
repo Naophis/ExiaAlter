@@ -161,11 +161,11 @@ char action(char mode, char goalX, char goalY, char fastMode) {
 			v = 5500;
 		}
 		if (res2 > 2) {
-			setLargeParam2500();
-			setOrvalParam2300();
+			set_param_map(Large, 2500);
+			set_param_map(Orval, 2300);
 		} else {
-			setLargeParam2400();
-			setOrvalParam2200();
+			set_param_map(Large, 2400);
+			set_param_map(Orval, 2200);
 		}
 		save_transam_param();
 		makePath(goalX, goalY, isFull, 0, 0, 0);
@@ -191,30 +191,30 @@ char action(char mode, char goalX, char goalY, char fastMode) {
 		inputNaiperTurnAll1950();
 		char res2 = uiVolatage(2);
 		if (res2 == 1) {
-			setLargeParam2000();
-			setOrvalParam2000();
+			set_param_map(Large, 2000);
+			set_param_map(Orval, 2000);
 			v = 5000;
 		} else if (res2 == 2) {
-			setLargeParam2050();
-			setOrvalParam2050();
+			set_param_map(Large, 2050);
+			set_param_map(Orval, 2050);
 			v = 5300;
 		} else if (res2 == 3) {
-			setLargeParam2100();
-			setOrvalParam2050();
+			set_param_map(Large, 2100);
+			set_param_map(Orval, 2050);
 			v = 5500;
 		} else if (res2 == 4) {
-			setLargeParam2200();
-			setOrvalParam2050();
+			set_param_map(Large, 2200);
+			set_param_map(Orval, 2050);
 			v = 5700;
 		}
 		save_high_param();
 		char res3 = uiVolatage(2);
 		if (res3 > 2) {
-			setLargeParam2500();
-			setOrvalParam2300();
+			set_param_map(Large, 2500);
+			set_param_map(Orval, 2300);
 		} else {
-			setLargeParam2400();
-			setOrvalParam2200();
+			set_param_map(Large, 2400);
+			set_param_map(Orval, 2200);
 		}
 		save_transam_param();
 
@@ -243,26 +243,26 @@ char action(char mode, char goalX, char goalY, char fastMode) {
 		if (res2 == 1) {
 			v = 5100;
 		} else if (res2 == 2) {
-			setLargeParam2050();
-			setOrvalParam2050();
+			set_param_map(Large, 2050);
+			set_param_map(Orval, 2050);
 			v = 5300;
 		} else if (res2 == 3) {
-			setLargeParam2100();
-			setOrvalParam2050();
+			set_param_map(Large, 2100);
+			set_param_map(Orval, 2050);
 			v = 5700;
 		} else if (res2 == 4) {
-			setLargeParam2200();
-			setOrvalParam2050();
+			set_param_map(Large, 2200);
+			set_param_map(Orval, 2050);
 			v = 5800;
 		}
 		save_high_param();
 		char res3 = uiVolatage(2);
 		if (res3 > 2) {
-			setLargeParam2500();
-			setOrvalParam2300();
+			set_param_map(Large, 2500);
+			set_param_map(Orval, 2300);
 		} else {
-			setLargeParam2400();
-			setOrvalParam2200();
+			set_param_map(Large, 2400);
+			set_param_map(Orval, 2200);
 		}
 		save_transam_param();
 
@@ -289,26 +289,26 @@ char action(char mode, char goalX, char goalY, char fastMode) {
 
 		inputNaiperTurnAll2050();
 		if (res2 == 1) {
-			setLargeParam2050();
+			set_param_map(Large, 2050);
 			v = 5300;
 		} else if (res2 == 2) {
-			setLargeParam2100();
+			set_param_map(Large, 2100);
 			v = 5500;
 		} else if (res2 == 3) {
-			setLargeParam2200();
+			set_param_map(Large, 2200);
 			v = 5800;
 		} else if (res2 == 4) {
-			setLargeParam2300();
+			set_param_map(Large, 2300);
 			v = 6000;
 		}
 		save_high_param();
 		char res3 = uiVolatage(2);
 		if (res3 > 2) {
-			setLargeParam2500();
-			setOrvalParam2300();
+			set_param_map(Large, 2500);
+			set_param_map(Orval, 2300);
 		} else {
-			setLargeParam2400();
-			setOrvalParam2200();
+			set_param_map(Large, 2400);
+			set_param_map(Orval, 2200);
 		}
 		save_transam_param();
 		makePath(goalX, goalY, isFull, 0, 0, 0);
@@ -334,23 +334,23 @@ char action(char mode, char goalX, char goalY, char fastMode) {
 		char res2 = uiVolatage(2);
 		inputNaiperTurnAll2100();
 		if (res2 == 1) {
-			setLargeParam2200();
+			set_param_map(Large, 2200);
 		} else if (res2 == 2) {
-			setLargeParam2200();
+			set_param_map(Large, 2200);
 		} else if (res2 == 3) {
-			setLargeParam2300();
+			set_param_map(Large, 2300);
 		} else if (res2 == 4) {
-			setLargeParam2300();
+			set_param_map(Large, 2300);
 		}
 		save_high_param();
 
 		char res3 = uiVolatage(2);
 		if (res3 > 2) {
-			setLargeParam2500();
-			setOrvalParam2300();
+			set_param_map(Large, 2500);
+			set_param_map(Orval, 2300);
 		} else {
-			setLargeParam2400();
-			setOrvalParam2200();
+			set_param_map(Large, 2400);
+			set_param_map(Orval, 2200);
 		}
 
 		save_transam_param();

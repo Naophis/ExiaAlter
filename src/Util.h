@@ -863,8 +863,16 @@ void logOutPut() {
 	globalState = PIVOT;
 	while (Swich == 1)
 		;
+	myprintf("t v_img v_rel ang_img dury_l duty_r battery LS45 RS45 FrontErr ");
+	cmt_wait(1);
+	myprintf("FrontSen settleGyro W_now angle V_Enc.r V_Enc.l alpha px2 feadforward_para_l feadforward_para_r ");
+	cmt_wait(1);
+	myprintf("LS2 RS2 sen_l2 sen_r2 C.g C.s C.v globalState Se2.error_now tmpLeftRef tmpLeftRef90 distance ");
+	cmt_wait(1);
+	myprintf("img_distance C.angles img_dist_l img_dist_r\r\n");
+	cmt_wait(1);
 	for (c = 0; c < L_Length; c++) {
-		myprintf("%d %f %f %f", log1[c], logs2[c], log3[c], log4[c]);
+		myprintf("%d %f %f %f", c, log1[c], log3[c], log4[c]);
 		cmt_wait(1);
 		myprintf(" %f %f %f %f", log5[c], log6[c], log7[c], log8[c]);
 		cmt_wait(1);

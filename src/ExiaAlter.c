@@ -10,7 +10,7 @@
 #include "config/Structor.h"
 
 #include "config/init.h"
-#include "serial.h"
+#include "include/serial.h"
 #include "spi.h"
 #include "Music.h"
 
@@ -25,11 +25,7 @@
 #include "PhysicalBasement.h"
 
 #include "motion/Run.h"
-#include "motion/DistCalc.h"
 #include "motion/WallOff.h"
-//#include "motion/WallOff2.h"
-#include "search/Map.h"
-#include "search/Search.h"
 #include "search/VectorSearch.h"
 #include "search/VectorPath.h"
 #include "Path.h"
@@ -42,20 +38,11 @@
 #include "search/Adachi.h"
 #include "search/cirkit.h"
 
-//#include "config/ParamImporter.h"
-
 #include "config/Setting.h"
-//#include "Mram.h"
 #include "Action.h"
 #include "OperationSystem.h"
 #include "config/SerialMapper.h"
 
-volatile void buzzer() {
-	buzzerTimer++;
-	if (m_time > 0 && buzzerTimer >= m_time) {
-		stopCmt1();
-	}
-}
 volatile void mtu6A() {
 	PORTD.PODR.BIT.B7 = 1;
 }
@@ -98,7 +85,7 @@ volatile void cmt() {
 	Physical_Basement();
 	if ((logs < (L_Length - 1)) && (cc == 1) && (time >= 0)) {
 		if ((time % (char) (logterm)) == 0) {
-			log1[logs] = (int) (V_now);
+			log1[logs] = (V_now);
 			log3[logs] = (V_Enc.r + V_Enc.l) / 2;
 			log4[logs] = (ang * 180 / PI); //ジャイロ
 			log5[logs] = Duty_l * 100;
@@ -256,8 +243,6 @@ void mtu4_B() {
 
 		getSensorData();
 		float tmpGyros = 0.250 * (gyros[0] + gyros[1] + gyros[2] + gyros[3]);
-		// float tmpGyros = gyros[3];
-//		float tmpGyros = 0.50 * (gyros[0] + gyros[2]);
 
 		settleGyro2 = (tmpGyros - G.ref) * G.th;
 
@@ -290,27 +275,17 @@ void mtu4_B() {
 		tpu_count = 0;
 
 		for (char i = 4; i > 0; i--) {
-			// sen_log_r[i] = sen_log_r[i - 1];
-			// sen_log_l[i] = sen_log_l[i - 1];
-			// sen_log_front[i] = sen_log_front[i - 1];
-			// sen_r[i] = sen_r[i - 1];
-			// sen_l[i] = sen_l[i - 1];
 			sen_r2[i] = sen_r2[i - 1];
 			sen_l2[i] = sen_l2[i - 1];
 		}
-		// sen_log_r[0] = RS_SEN45.now;
-		// sen_log_l[0] = LS_SEN45.now;
-		// sen_r[0] = RS_SEN45.now > running_wall_off_r;
-		// sen_l[0] = LS_SEN45.now > running_wall_off_l;
 		sen_r2[0] = RS_SEN2.now > search_wall_off_r;
 		sen_l2[0] = LS_SEN2.now > search_wall_off_l;
-		// sen_log_front[0] = Front_SEN.now;
 		break;
 	}
 	sensor_led_off();
 }
 
-void initRX64M() {
+void initExiaAlter() {
 	initClock();
 	initLED();
 	initSensorLED();
@@ -328,33 +303,9 @@ void initRX64M() {
 	importParam();
 
 }
-void test() {
-	ComFlag = true;
-}
-
-void printErrorEnum() {
-	myprintf("%s %d\r\n", STR(FLASH_SUCCESS), FLASH_SUCCESS);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_BUSY), FLASH_ERR_BUSY);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_ACCESSW), FLASH_ERR_ACCESSW);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_FAILURE), FLASH_ERR_FAILURE);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_CMD_LOCKED), FLASH_ERR_CMD_LOCKED);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_LOCKBIT_SET), FLASH_ERR_LOCKBIT_SET);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_FREQUENCY), FLASH_ERR_FREQUENCY);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_ALIGNED), FLASH_ERR_ALIGNED);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_BOUNDARY), FLASH_ERR_BOUNDARY);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_OVERFLOW), FLASH_ERR_OVERFLOW);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_BYTES), FLASH_ERR_BYTES);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_ADDRESS), FLASH_ERR_ADDRESS);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_BLOCKS), FLASH_ERR_BLOCKS);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_PARAM), FLASH_ERR_PARAM);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_NULL_PTR), FLASH_ERR_NULL_PTR);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_UNSUPPORTED), FLASH_ERR_UNSUPPORTED);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_SECURITY), FLASH_ERR_SECURITY);
-	myprintf("%s %d\r\n", STR(FLASH_ERR_TIMEOUT), FLASH_ERR_TIMEOUT);
-}
 
 void main(void) {
-	initRX64M();
+	initExiaAlter();
 	myprintf("hello world\r\n");
 	batteryCheck();
 	setupCmt = enableMPU = os_escape = true;

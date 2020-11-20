@@ -61,7 +61,7 @@ double dt = 0.001 / 4;
 #define ABS(IN) ((IN) < 0 ? - (IN) : (IN))
 #define Vo 0.0f				//初速度
 #define Wo 0.5f			//初期角速度
-#define W_max 25.0f
+#define W_max 60.0f
 //#define W_max 5.5f
 volatile double W_now = 0;
 volatile double alpha = 0.0;			//	[rad/s^2]
@@ -318,7 +318,7 @@ volatile vector_map m[MAZE_SIZE][MAZE_SIZE];
 #define Q_LENGTH 2048
 int que[Q_LENGTH][3];
 #define L_Length 2900
-volatile int log1[L_Length];
+volatile float log1[L_Length];
 volatile float logs2[L_Length];
 volatile float log3[L_Length];
 volatile float log4[L_Length];

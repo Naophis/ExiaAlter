@@ -1,16 +1,13 @@
 /*
- * serial.h
+ * serial.c
  *
- *  Created on: 2016/06/02
- *      Author: Naoto
+ *  Created on: 2020/11/17
+ *      Author: nao12
  */
-
-#ifndef SERIAL_H_
-#define SERIAL_H_
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "iodefine.h"
+#include <iodefine.h>
 
 #define BUFFER_LENGTH 1024
 #define QUEUE_SIZE 1024
@@ -184,5 +181,3 @@ char charget(void) {
 	ICU.IR[VECT_SCI1_RXI1].BIT.IR = 0;
 	return data;
 }
-
-#endif /* SERIAL_H_ */

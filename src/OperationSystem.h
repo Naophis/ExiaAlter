@@ -126,78 +126,86 @@ void testRun2(float v, float accele, float diaccele, float dist, float vM) {
 }
 
 void inputNaiperTurnAll500() {
-	setNormalParam500();
-	setLargeParam1000();
-	setOrvalParam1000();
-	setDia45Param1000();
-	setDia135Param1000();
-	setDia90Param1000();
+	float v = 500;
+	set_param_map(Normal, v);
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 
 void inputNaiperTurnAll1000() {
-	setNormalParam1000();
-	setLargeParam1000();
-	setOrvalParam1000();
-	setDia45Param1000();
-	setDia135Param1000();
-	setDia90Param1000();
+	float v = 1000;
+	set_param_map(Normal, v);
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 
 void inputNaiperTurnAll1500() {
-	setLargeParam1500();
-	setOrvalParam1500();
-	setDia45Param1500();
-	setDia135Param1500();
-	setDia90Param1500();
+	float v = 1500;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 
 void inputNaiperTurnAll1700() {
-	setLargeParam1700();
-	setOrvalParam1700();
-	setDia45Param1700();
-	setDia135Param1700();
-	setDia90Param1700();
+	float v = 1700;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 void inputNaiperTurnAll1800() {
-	setLargeParam1800();
-	setOrvalParam1800();
-	setDia45Param1800();
-	setDia135Param1800();
-	setDia90Param1800();
+	float v = 1800;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 void inputNaiperTurnAll1900() {
-	setLargeParam1900();
-	setOrvalParam1900();
-	setDia45Param1900();
-	setDia135Param1900();
-	setDia90Param1900();
+	float v = 1900;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 void inputNaiperTurnAll1950() {
-	setLargeParam1950();
-	setOrvalParam1950();
-	setDia45Param1950();
-	setDia135Param1950();
-	setDia90Param1900();
+	float v = 1950;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, v);
 }
 void inputNaiperTurnAll2000() {
-	inputNaiperTurnAll1950();
-	setLargeParam2000();
-	setOrvalParam2000();
-	setDia45Param2000();
-	setDia135Param2000();
-	setDia90Param1900();
+	float v = 2000;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, v);
+	set_param_map(Dia135, v);
+	set_param_map(Dia90, 1900);
 }
 void inputNaiperTurnAll2050() {
-	inputNaiperTurnAll2000();
-	setLargeParam2050();
-	setOrvalParam2050();
-	setDia45Param2000();
-	setDia135Param2000();
-	setDia90Param1900();
+	float v = 2050;
+	set_param_map(Large, v);
+	set_param_map(Orval, v);
+	set_param_map(Dia45, 2000);
+	set_param_map(Dia135, 2000);
+	set_param_map(Dia90, 1900);
 }
 void inputNaiperTurnAll2100() {
 	inputNaiperTurnAll2050();
-	setLargeParam2100();
+	float v = 2100;
+	set_param_map(Large, v);
 }
 /**
  * 	t_radiusData large;
@@ -208,153 +216,17 @@ void inputNaiperTurnAll2100() {
  t_radiusData kojima;
  */
 
-void callParamForCircit(float vMax) {
-	RS_SEN45.ref = *(float *) 1049944;
-	myprintf("RS_SEN45.ref2	%f	%d\r\n", RS_SEN45.ref, 1049944);
-	LS_SEN45.ref = *(float *) 1049948;
-	myprintf("LS_SEN45.ref2	%f	%d\r\n", LS_SEN45.ref, 1049948);
-	R_WALL_OFF = *(float *) 1049952;
-	myprintf("R_WALL_OFF3	%f	%d\r\n", R_WALL_OFF, 1049952);
-	FRONT_WALL_ON = *(float *) 1049956;
-	myprintf("FrontCtrl111	%f	%d\r\n", FRONT_WALL_ON, 1049956);
-	if (vMax == 2000) {
-		setPrms(Large, 90, 180, 16, 10, 0, 0, 0.09261608123779297, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2100) {
-		setPrms(Large, 90, 180, 13, 10, 0, 0, 0.08820629119873047, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2200) {
-		setPrms(Large, 90, 180, 9, 10, 0, 0, 0.0841970443725586, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2300) {
-		setPrms(Large, 90, 180, 6, 10, 0, 0, 0.080535888671875, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2400) {
-		setPrms(Large, 90, 170, 15, 10, 0, 0, 0.0728921890258789, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2500) {
-		setPrms(Large, 90, 170, 12, 10, 0, 0, 0.069976806640625, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2600) {
-		setPrms(Large, 90, 170, 6.0, 10, 0, 0, 0.06728553771972656, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 2800) {
-		setPrms(Large, 90, 170, 6.0, 10, 0, 0, 0.06728553771972656, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	} else if (vMax == 3000) {
-		setPrms(Large, 90, 160, 0.0, 10, 0, 0, 0.05488395690917969, 4, vMax);
-		setPrms3(Large, 13.5, 0, 40);
-	}
-}
-
 void callParam(float vMax) {
 	if (vMax == 500) {
-		setNormalParam500();
-		setLargeParam500();
-		setOrvalParam500();
-		setDia45Param500();
-		setDia135Param500();
-		setDia90Param500();
+		set_param_map(Normal, vMax);
 	} else if (vMax == 1000) {
-		setNormalParam1000();
-		setLargeParam1000();
-		setOrvalParam1000();
-		setDia45Param1000();
-		setDia135Param1000();
-		setDia90Param1000();
-	} else if (vMax == 1500) {
-		setLargeParam1500();
-		setOrvalParam1500();
-		setDia45Param1500();
-		setDia135Param1500();
-		setDia90Param1500();
-	} else if (vMax == 1700) {
-		setLargeParam1700();
-		setOrvalParam1700();
-		setDia45Param1700();
-		setDia135Param1700();
-		setDia90Param1700();
-	} else if (vMax == 1800) {
-		setLargeParam1800();
-		setOrvalParam1800();
-		setDia45Param1800();
-		setDia135Param1800();
-		setDia90Param1800();
-	} else if (vMax == 1900) {
-		setLargeParam1900();
-		setOrvalParam1900();
-		setDia45Param1900();
-		setDia135Param1900();
-		setDia90Param1900();
-	} else if (vMax == 1950) {
-		setLargeParam1950();
-		setOrvalParam1950();
-		setDia45Param1950();
-		setDia135Param1950();
-		setDia90Param1950();
-	} else if (vMax == 2000) {
-		setLargeParam2000();
-		setOrvalParam2000();
-		setDia45Param2000();
-		setDia135Param2000();
-		setDia90Param2000();
-	} else if (vMax == 2050) {
-		setLargeParam2050();
-		setOrvalParam2050();
-		setDia45Param2050();
-		setDia135Param2050();
-		setDia90Param2050();
-	} else if (vMax == 2100) {
-		setLargeParam2100();
-		setOrvalParam2100();
-		setDia45Param2100();
-		setDia135Param2100();
-		setDia90Param2100();
-	} else if (vMax == 2200) {
-		setLargeParam2200();
-		setOrvalParam2200();
-		setDia45Param2200();
-		setDia135Param2200();
-		setDia90Param2200();
-	} else if (vMax == 2300) {
-		setLargeParam2300();
-		setOrvalParam2300();
-		setDia45Param2300();
-		setDia135Param2300();
-		setDia90Param2300();
-	} else if (vMax == 2400) {
-		setLargeParam2400();
-		setOrvalParam2400();
-		setDia45Param2400();
-		setDia135Param2400();
-		setDia90Param2400();
-	} else if (vMax == 2500) {
-		setLargeParam2500();
-		setOrvalParam2500();
-		setDia45Param2500();
-		setDia135Param2500();
-		setDia90Param2500();
-	} else if (vMax == 2600) {
-		setLargeParam2600();
-		setOrvalParam2600();
-		setDia45Param2600();
-		setDia135Param2600();
-		setDia90Param2600();
-	} else if (vMax == 2700) {
-		setLargeParam2700();
-		setOrvalParam2700();
-		setDia45Param2700();
-		setDia135Param2700();
-		setDia90Param2700();
-	} else if (vMax == 2800) {
-		setLargeParam2800();
-		setOrvalParam2800();
-		setDia45Param2800();
-		setDia135Param2800();
-		setDia90Param2800();
-	} else if (vMax == 3000) {
-		setLargeParam3000();
+		set_param_map(Normal, vMax);
 	}
+	set_param_map(Large, vMax);
+	set_param_map(Orval, vMax);
+	set_param_map(Dia45, vMax);
+	set_param_map(Dia135, vMax);
+	set_param_map(Dia90, vMax);
 }
 
 void testSlalom3() {
@@ -518,9 +390,9 @@ void testNormalSlalom() {
 	if (vMax >= 1000) {
 		fanMode = SearchRun;
 		startVacume2(70);
-		setNormalParam1000();
+		set_param_map(Normal, 1000);
 	} else if (vMax >= 500) {
-		setNormalParam500();
+		set_param_map(Normal, 500);
 	}
 
 	mtu_start();
@@ -591,9 +463,9 @@ void testNormalSlalom2() {
 	if (vMax >= 1000) {
 		fanMode = SearchRun;
 		startVacume2(70);
-		setNormalParam1000();
+		set_param_map(Normal, 1000);
 	} else {
-		setNormalParam500();
+		set_param_map(Normal, 500);
 	}
 
 	mtu_start();
@@ -1275,151 +1147,6 @@ void checkMemory(int goalX, int goalY) {
 
 	exportMap2();
 }
-void test12() {
-	sensingMode = AtackStraight;
-	ledOn = true;
-	char up = false;
-	while (1) {
-		myprintf("%d	%d\r\n", (sen_log_r[0] > sen_log_r[1]),
-				(sen_log_r[1] > sen_log_r[2]));
-
-		myprintf("%f	%f	%f	%f	%f\r\n", sen_log_r[0], sen_log_r[1], sen_log_r[2],
-				sen_log_r[3], sen_log_r[4]);
-		cmt_wait(100);
-		if (!up) {
-			up = checkUp(R);
-		} else {
-			if (checkDown(R)) {
-				positionControlValueFlg = 0;
-				cmtMusic(C2_, 500);
-				cmt_wait(500);
-				up = false;
-//				return true;
-			}
-		}
-	}
-	ledOn = false;
-}
-
-void frontCtrlTest() {
-	char RorL = eigherRightLeft() == Right ? R : L;
-//	float Velocity = 500;
-	gyroZeroCheck(true);
-	cmt_wait(500);
-	cc = 1;
-	gyroOn = 1;
-	V_now = 0;
-	mtu_start();
-	V_now = 100;
-	while (distance < 180 * 1) {
-
-	}
-//	realRun(Velocity, 3500, 3500, 60, 40);
-//	frontCtrl4();
-
-//	frontWallCtrl = true;
-//	cmt_wait(500);
-//	frontWallCtrl = false;
-	mtu_stop();
-	cmt_wait(500);
-//	mtu_start();
-//	if (RorL == R) {
-//		gyroRoll(R, 90, 30, 30);
-//	} else {
-//		gyroRoll(L, 90, 30, 30);
-//	}
-//	back(-500, -2000, 480, 0);
-	logOutPut();
-}
-
-void frontCtrlTest2() {
-	gyroZeroCheck(true);
-	cmt_wait(500);
-	cc = 1;
-	gyroOn = 1;
-	V_now = 0;
-	mtu_start();
-	frontWallCtrl = true;
-	readGyroParam();
-	while (1) {
-		myprintf("%c[2J", ESC); /* 画面消去 */
-		myprintf("%c[0;0H", ESC); /* 戦闘戻す*/
-		myprintf("battery=%f V\r\n", battery);
-		myprintf("Gyro=%f\r\n", settleGyro);
-		myprintf("	%f %f\r\n", LS_SEN45.now, RS_SEN45.now);
-		myprintf("%f 		%f\r\n", 0, Front_SEN.now);
-		myprintf("Duty:	%f	%f\r\n", Duty_l, Duty_r);
-		myprintf("Velocity:	%f	%f\r\n", V_Enc.l, V_Enc.r);
-		myprintf("angle:	%f\r\n", ang * 180 / PI);
-		myprintf("distance:	%f\r\n", distance);
-
-		cmt_wait(100);
-		if (Swich == 0) {
-			break;
-		}
-		if (!fail) {
-//			break;
-		}
-	}
-	frontWallCtrl = false;
-	logOutPut();
-}
-
-void testRpm1() {
-	while (1) {
-		myprintf("%c[2J", ESC); /* 画面消去 */
-		myprintf("%c[0;0H", ESC); /* 戦闘戻す*/
-		myprintf("battery=%f V\r\n", battery);
-		myprintf("Gyro=%f\r\n", settleGyro);
-		myprintf("	%f %f\r\n", LS_SEN45.now, RS_SEN45.now);
-		myprintf("%f 		%f\r\n", 0, Front_SEN.now);
-		myprintf("Duty:	%f	%f\r\n", Duty_l, Duty_r);
-		myprintf("Velocity:	%f	%f\r\n", V_Enc.l, V_Enc.r);
-		myprintf("angle:	%f\r\n", ang * 180 / PI);
-		myprintf("distance:	%f\r\n", distance);
-		myprintf("RPM_R:	%f\r\n", getRpm(R));
-		myprintf("RPM_L:	%f\r\n", getRpm(L));
-		cmt_wait(100);
-		if (!PushTop) {
-			V_now = 500;
-		}
-		if (!PushRight) {
-			W_now = 1;
-		}
-		if (!PushLeft) {
-			W_now = -1;
-		}
-		if (Swich == 0) {
-			break;
-		}
-	}
-}
-
-void autoCalibration_wheel() {
-
-}
-
-void detectSysId() {
-
-	motionCheck();
-	cmt_wait(500);
-	gyroZeroCheck(false);
-
-	mtu_start();
-	enableSystemIdentification = true;
-	timer = 0;
-	resetVelocityGain();
-	resetGyroParam();
-
-	long limit = (long) (*(float *) 1049480);
-	while (timer < limit) {
-
-	}
-	enableSystemIdentification = false;
-	mtu_stop();
-	detectSysIdLogOutput();
-
-}
 
 void operation() {
 	volatile char goalX = (char) (*(float *) 1049336);
@@ -1513,7 +1240,7 @@ void operation() {
 			break;
 		case 12: //System Identification 並進
 			cmtMusic(A3_, 100);
-			detectSysId();
+			// detectSysId();
 			break;
 		case 13: //System Identification 回転
 			cmtMusic(B3_, 100);

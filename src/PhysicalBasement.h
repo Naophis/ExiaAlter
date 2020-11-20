@@ -491,33 +491,6 @@ void errorVelocity(void) {
 			} else {
 				V_now = V_now + C.v2;
 			}
-
-//			if (SeFrnt.error_now != 0) {
-//				SeFrntAngle.error_now = check_sen_error_frontSide();
-//				SeFrntAngle.error_old += SeFrntAngle.error_now;
-//
-//				Dists2.Kp = *(float *) 1050056;
-//				// Dists2.Ki = *(float *) 1049404;
-//
-//				float limit2 = *(float *) 1050052;
-//
-//				C.w = Dists2.Kp * SeFrntAngle.error_now;
-//				//  + Dists2.Ki * SeFrntAngle.error_old;
-//
-//				if (ABS(C.w) > limit2) {
-//					if (C.w > 0) {
-//						W_now = W_now + limit2;
-//					} else {
-//						W_now = W_now - limit2;
-//					}
-//				} else {
-//					W_now = W_now + C.w;
-//				}
-//			} else {
-//				SeFrntAngle.error_now = 0;
-//				SeFrntAngle.error_old = 0;
-//			}
-
 		} else if (dia == 0) {
 			Se.before = Se.error_now;
 			Se.error_now = check_sen_error();
@@ -547,7 +520,6 @@ void errorVelocity(void) {
 			}
 
 		} else if (dia == 1 && Sen_Dia_Side.Kp != 0) {
-//			Se2.error_now = check_sen_error_dia_side();
 			Se2.before = Se2.error_now;
 			Se2.error_now = check_sen_error_dia_side_v2();
 
@@ -671,6 +643,10 @@ void errorVelocity(void) {
 		const char enableGPID = (char) (*(float *) 1049808);
 		float C_old2 = C_old.g;
 		C_old.g = C.g;
+
+		Gyro.Kp = interp_w_kp(ABS(W_now));
+		Gyro.Ki = interp_w_ki(ABS(W_now));
+		Gyro.Kd = interp_w_kd(ABS(W_now));
 
 		if (enableGPID) {
 			C.g = (Gyro.Kp * Gy.error_now + Gyro.Ki * Gy.error_old
@@ -820,11 +796,6 @@ float FB_calc(char RorL) {
 	return duty;
 }
 
-float FB_calc_omega() {
-	return Omega.Kp * (W_enc.error_now)
-			+ Omega.Ki * (W_enc.error_now + W_enc.error_old)
-			+ Omega.Kd * (W_enc.error_now - W_enc.error_delta);
-}
 float FB_velocity() {
 	const char enableVPID = (char) (*(float *) 1049804);
 	float C_old2 = C_old.v;
