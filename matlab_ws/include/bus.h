@@ -11,7 +11,7 @@ typedef struct
     float end_w;
     float alpha;
     float tgt_dist;
-    float tgt_angle
+    float tgt_angle;
 } t_tgt;
 
 typedef struct
@@ -34,7 +34,7 @@ typedef struct
     float ang;
     t_slalom sla_param;
     char state;
-    char pivot_state
+    char pivot_state;
 } t_ego;
 
 typedef struct
@@ -53,7 +53,7 @@ typedef struct
 
 typedef enum
 {
-    NONE = 0,
+    NONE_MODE = 0,
     ST_RUN = 1,
     PIVOT_TURN = 2,
     SLAROM_RUN = 3
