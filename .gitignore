@@ -7,3 +7,5 @@ gen_code/
 *.mexw64
 slprj/
 RUN_MODE.m
+test.csv
+*.mat

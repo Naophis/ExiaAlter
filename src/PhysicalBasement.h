@@ -35,6 +35,7 @@ float lastPeekL2 = 0;
 
 float peekOrderR = 1800;
 float peekOrderL = 1800;
+
 void pushLatestSensor(float r, float l) {
 	if (r > peekOrderR) {
 		if (peekRight < r) {
@@ -137,11 +138,14 @@ void enc_to_vel(void) {
 	rpmR_old = rpmR;
 	rpmL_old = rpmL;
 
-	rpmR = ((V_now - Tread * 500 * W_now) / (tmp_tire / 2)) * 60.0 / (2.0 * PI);
-	rpmL = ((V_now + Tread * 500 * W_now) / (tmp_tire / 2)) * 60.0 / (2.0 * PI);
+	rpmR = ((V_now - Tread * 500 * tgt_w_now) / (tmp_tire / 2)) * 60.0
+			/ (2.0 * PI);
+	rpmL = ((V_now + Tread * 500 * tgt_w_now) / (tmp_tire / 2)) * 60.0
+			/ (2.0 * PI);
 
 	Velocity.before = Velocity.error_now;
-	Velocity.error_now = V_now - (V_Enc.r + V_Enc.l) / 2;
+	Velocity.error_now = tgt_v_now - (V_Enc.r + V_Enc.l) / 2;
+	// Velocity.error_now = V_now - (V_Enc.r + V_Enc.l) / 2;
 	Velocity.error_old += Velocity.error_now;
 	Velocity.error_delta = Velocity.error_now - Velocity.before;
 
@@ -363,8 +367,10 @@ float check_sen_error_dia_side_v2(void) {
 	if (diaStrwallCount_r > 0) {
 //		float tmpRightRef = sen_r_dia_img[(int) (img_dist_r)];
 //		float tmpRightRef90 = sen_r90_dia[(int) (img_dist_r)];
-		float tmpRightRef = getLerpValue(img_dist_r, sen_r_dia_img, sizeof(sen_r_dia_img));
-		float tmpRightRef90 = getLerpValue(img_dist_r, sen_r90_dia, sizeof(sen_r90_dia));
+		float tmpRightRef = getLerpValue(img_dist_r, sen_r_dia_img,
+				sizeof(sen_r_dia_img));
+		float tmpRightRef90 = getLerpValue(img_dist_r, sen_r90_dia,
+				sizeof(sen_r90_dia));
 		if (ABS(RS_SEN45.now - RS_SEN45.old) < diff
 				&& RS_SEN45.now > (tmpRightRef - diffthread)
 				&& validateImgIndex((int) img_dist_r)) {
@@ -383,8 +389,10 @@ float check_sen_error_dia_side_v2(void) {
 	if (diaStrwallCount_l > 0) {
 //		float tmpLeftRef = sen_l_dia_img[(int) (img_dist_l)];
 //		float tmpLeftRef90 = sen_l90_dia[(int) (img_dist_l)];
-		float tmpLeftRef = getLerpValue(img_dist_l, sen_l_dia_img, sizeof(sen_l_dia_img));
-		float tmpLeftRef90 = getLerpValue(img_dist_l, sen_l90_dia, sizeof(sen_l90_dia));
+		float tmpLeftRef = getLerpValue(img_dist_l, sen_l_dia_img,
+				sizeof(sen_l_dia_img));
+		float tmpLeftRef90 = getLerpValue(img_dist_l, sen_l90_dia,
+				sizeof(sen_l90_dia));
 		if (ABS(LS_SEN45.now - LS_SEN45.old) < diff
 				&& LS_SEN45.now > (tmpLeftRef - diffthread)
 				&& validateImgIndex((int) img_dist_l)) {
@@ -473,25 +481,7 @@ void errorVelocity(void) {
 	const float CgLimit = *(float *) 1049468;
 
 	if (positionControlValueFlg == 1) {
-		if (frontwall_ctrl == 1) {
-			// V_nowを変更する
-			SeFrnt.error_now = check_sen_error_front();
-			SeFrnt.error_old += SeFrnt.error_now;
-			Dists.Kp = *(float *) 1049400;
-			Dists.Ki = *(float *) 1049404;
-			float limit = *(float *) 1050048;
-
-			C.v2 = Dists.Kp * SeFrnt.error_now + Dists.Ki * SeFrnt.error_old;
-			if (ABS(C.v2) > limit) {
-				if (C.v2 > 0) {
-					V_now = V_now + limit;
-				} else {
-					V_now = V_now - limit;
-				}
-			} else {
-				V_now = V_now + C.v2;
-			}
-		} else if (dia == 0) {
+		if (dia == 0) {
 			Se.before = Se.error_now;
 			Se.error_now = check_sen_error();
 
@@ -628,7 +618,8 @@ void errorVelocity(void) {
 			C.angles = -CgLimit;
 		}
 	} else {
-		Gy.error_now = (W_now - settleGyro);
+		Gy.error_now = (tgt_w_now - settleGyro);
+		// Gy.error_now = (W_now - settleGyro);
 		if (C.g > CgLimit || C.g < -CgLimit) {
 		} else {
 			Gy.error_old += Gy.error_now;
@@ -644,9 +635,9 @@ void errorVelocity(void) {
 		float C_old2 = C_old.g;
 		C_old.g = C.g;
 
-		Gyro.Kp = interp_w_kp(ABS(W_now));
-		Gyro.Ki = interp_w_ki(ABS(W_now));
-		Gyro.Kd = interp_w_kd(ABS(W_now));
+		Gyro.Kp = interp_w_kp(ABS(tgt_w_now));
+		Gyro.Ki = interp_w_ki(ABS(tgt_w_now));
+		Gyro.Kd = interp_w_kd(ABS(tgt_w_now));
 
 		if (enableGPID) {
 			C.g = (Gyro.Kp * Gy.error_now + Gyro.Ki * Gy.error_old
@@ -704,6 +695,7 @@ float feadforward(char RorL) {
 		}
 	}
 
+	// return Mass * tgt_accl * tmp_wheel * Resist / (GEAR * Km * 1000);
 	return Mass * acc * tmp_wheel * Resist / (GEAR * Km * 1000);
 }
 float feadforward_para(char RorL) {
@@ -715,9 +707,9 @@ float feadforward_para(char RorL) {
 		}
 	}
 	if (RorL == R) {
-		return Lm * (-alpha) * tmp_wheel * Resist / (GEAR * Km) / Tread;
+		return Lm * (-tgt_alpha) * tmp_wheel * Resist / (GEAR * Km) / Tread;
 	}
-	return Lm * (alpha) * tmp_wheel * Resist / (GEAR * Km) / Tread;
+	return Lm * tgt_alpha * tmp_wheel * Resist / (GEAR * Km) / Tread;
 }
 
 float wheel_lm(char RorL) {
@@ -753,9 +745,11 @@ float FF_calc(char RorL, float w, float al) {
 	float whrlm = 0;
 
 	if (RorL == R) {
-		rpm = (V_now / 1000 - Tread / 2 * W_now) / (60 * tmp_tire / 2) * 1000;
+		rpm = (tgt_v_now / 1000 - Tread / 2 * tgt_w_now) / (60 * tmp_tire / 2)
+				* 1000;
 	} else {
-		rpm = (V_now / 1000 + Tread / 2 * W_now) / (60 * tmp_tire / 2) * 1000;
+		rpm = (tgt_v_now / 1000 + Tread / 2 * tgt_w_now) / (60 * tmp_tire / 2)
+				* 1000;
 	}
 
 	float counterV = (Ke + friction) * rpm;
@@ -765,7 +759,7 @@ float FF_calc(char RorL, float w, float al) {
 	if (V_now == 0) {
 		resist_str = 0;
 	}
-	if (W_now == 0) {
+	if (tgt_w_now == 0) {
 		resist_roll = 0;
 	}
 	if (RorL == R) {
@@ -800,7 +794,7 @@ float FB_velocity() {
 	const char enableVPID = (char) (*(float *) 1049804);
 	float C_old2 = C_old.v;
 	C_old.v = C.v;
-	
+
 	Vel.Kp = interp_v_kp(V_now);
 	Vel.Ki = interp_v_ki(V_now);
 	Vel.Kd = interp_v_kd(V_now);
@@ -819,15 +813,12 @@ float FB_velocity() {
 
 float FB_distance() {
 	float dist_before = (img_distance - distance);
-
-	img_distance += V_now * dt;
-	distance += (V_Enc.r + V_Enc.l) * dt / 2;
-
-	Distance.error_now = (img_distance - distance);
-	Distance.error_old += Distance.error_now;
-	Distance.error_delta = Distance.error_now - dist_before;
-	return (Dists.Kp * Distance.error_now + Dists.Ki * Distance.error_old
-			+ Dists.Kd * Distance.error_delta);
+	return 0;
+//	Distance.error_now = (img_distance - distance);
+//	Distance.error_old += Distance.error_now;
+//	Distance.error_delta = Distance.error_now - dist_before;
+//	return (Dists.Kp * Distance.error_now + Dists.Ki * Distance.error_old
+//			+ Dists.Kd * Distance.error_delta);
 }
 
 float FB_calc_straight() {
@@ -873,6 +864,39 @@ float FB_calc_pararell() {
 	return C.angles + C.g + tmpC_s + tmpC_s2;
 }
 
+void set_predict_tgt_data() {
+	for (int i = 0; i < PREDICT_SIZE; i++) {
+		target_data_list[i].accl = target_data.accl;
+		target_data_list[i].alpha = target_data.alpha;
+		target_data_list[i].decel = target_data.decel;
+		target_data_list[i].end_v = target_data.end_v;
+		target_data_list[i].end_w = target_data.end_w;
+		target_data_list[i].tgt_angle = target_data.tgt_angle;
+		target_data_list[i].tgt_dist = target_data.tgt_dist;
+		target_data_list[i].v_max = target_data.v_max;
+		target_data_list[i].w_max = target_data.w_max;
+
+		ego_data_in_list[i].accl = ego_data_in.accl;
+		ego_data_in_list[i].alpha = ego_data_in.alpha;
+		ego_data_in_list[i].ang = ego_data_in.ang;
+		ego_data_in_list[i].dist = ego_data_in.dist;
+		ego_data_in_list[i].img_ang = ego_data_in.img_ang;
+		ego_data_in_list[i].img_dist = ego_data_in.img_dist;
+		ego_data_in_list[i].pivot_state = ego_data_in.pivot_state;
+		ego_data_in_list[i].sla_param.base_alpha =
+				ego_data_in.sla_param.base_alpha;
+		ego_data_in_list[i].sla_param.base_time =
+				ego_data_in.sla_param.base_time;
+		ego_data_in_list[i].sla_param.counter = ego_data_in.sla_param.counter;
+		ego_data_in_list[i].sla_param.limit_time_count =
+				ego_data_in.sla_param.limit_time_count;
+		ego_data_in_list[i].sla_param.pow_n = ego_data_in.sla_param.pow_n;
+		ego_data_in_list[i].sla_param.state = ego_data_in.sla_param.state;
+		ego_data_in_list[i].v = ego_data_in.v;
+		ego_data_in_list[i].w = ego_data_in.w;
+	}
+}
+
 void dutyCalcuration2(void) {
 	float dutyR = 0, dutyL = 0;
 	float FB_straight_duty = FB_calc_straight();
@@ -907,6 +931,9 @@ void dutyCalcuration2(void) {
 		GPT0.GTCCRA = GPT0.GTCCRC = GPT1.GTCCRA = GPT1.GTCCRC = 0;
 	}
 }
+void mpc_tgt_calc_step(RT_MODEL_mpc_tgt_calc_T * const mpc_tgt_calc_M,
+		t_tgt *mpc_tgt_calc_U_tgt, t_ego *mpc_tgt_calc_U_ego,
+		int32_T mpc_tgt_calc_U_mode, t_ego *mpc_tgt_calc_Y_Out1);
 
 //物理量ベース計算
 void Physical_Basement(void) {
@@ -929,26 +956,115 @@ void Physical_Basement(void) {
 			}
 		}
 	}
-	errorVelocity();
-
-	V_old = V_now;
-	W_old = W_now;
-	V_now += acc * dt;
-	W_now += alpha * dt;
 
 	char gyroMode2 = (char) (*(float *) 1049800);
-
 	if (gyroMode2) {
 		ang += settleGyro * dt;
 	} else {
 		ang += G.now * dt;
 	}
-	angle += W_now * dt;
+	distance += (V_Enc.r + V_Enc.l) * dt / 2;
 
-	px2 += V_now * sinf(ang) * dt;
-	py2 += V_now * cosf(ang) * dt;
+	ego_data_in.ang = ang;
+	ego_data_in.dist = distance;
+
+	// set_predict_tgt_data();
+
+	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data, &ego_data_in,
+			mpc_tgt_calc_mode, &ego_data_out);
+
+	// for (int i = 0; i < PREDICT_SIZE; i++) {
+	// 	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data_list[i],
+	// 			&ego_data_in_list[i], mpc_tgt_calc_mode, &ego_data_out_list[i]);
+	// 	if(i<PREDICT_SIZE-1){
+	// 		ego_data_in_list[i + 1].accl = ego_data_out_list[i].accl;
+	// 		ego_data_in_list[i + 1].alpha = ego_data_out_list[i].alpha;
+	// 		ego_data_in_list[i + 1].ang = ego_data_out_list[i].ang;
+	// 		ego_data_in_list[i + 1].dist = ego_data_out_list[i].dist;
+	// 		ego_data_in_list[i + 1].img_ang = ego_data_out_list[i].img_ang;
+	// 		ego_data_in_list[i + 1].img_dist = ego_data_out_list[i].img_dist;
+	// 		ego_data_in_list[i + 1].pivot_state = ego_data_out_list[i].pivot_state;
+	// 		ego_data_in_list[i + 1].sla_param.base_alpha =
+	// 			ego_data_out_list[i].sla_param.base_alpha;
+	// 		ego_data_in_list[i + 1].sla_param.base_time =
+	// 			ego_data_out_list[i].sla_param.base_time;
+	// 		ego_data_in_list[i + 1].sla_param.counter =
+	// 			ego_data_out_list[i].sla_param.counter;
+	// 		ego_data_in_list[i + 1].sla_param.limit_time_count =
+	// 			ego_data_out_list[i].sla_param.limit_time_count;
+	// 		ego_data_in_list[i + 1].sla_param.pow_n =
+	// 			ego_data_out_list[i].sla_param.pow_n;
+	// 		ego_data_in_list[i + 1].sla_param.state =
+	// 			ego_data_out_list[i].sla_param.state;
+	// 		ego_data_in_list[i + 1].v = ego_data_out_list[i].v;
+	// 		ego_data_in_list[i + 1].w = ego_data_out_list[i].w;
+	// 	}
+	// }
+
+// 	ego_data_in.accl = ego_data_out_list[0].accl;
+// 	ego_data_in.alpha = ego_data_out_list[0].alpha;
+// //	ego_data_in.ang = ego_data_out_list[0].ang;
+// //	ego_data_in.dist = ego_data_out_list[0].dist;
+// 	ego_data_in.pivot_state = ego_data_out_list[0].pivot_state;
+// 	ego_data_in.sla_param = ego_data_out_list[0].sla_param;
+// 	ego_data_in.state = ego_data_out_list[0].state;
+// 	ego_data_in.v = ego_data_out_list[0].v;
+// 	ego_data_in.w = ego_data_out_list[0].w;
+// 	ego_data_in.sla_param.state = ego_data_out_list[0].sla_param.state;
+// 	ego_data_in.sla_param.counter = ego_data_out_list[0].sla_param.counter;
+// 	ego_data_in.sla_param.state = ego_data_out_list[0].sla_param.state;
+
+// 	ego_data_in.img_ang = ego_data_out_list[0].img_ang;
+// 	ego_data_in.img_dist = ego_data_out_list[0].img_dist;
+
+// 	tgt_v_now = ego_data_out_list[0].v;
+// 	tgt_w_now = ego_data_out_list[0].w;
+// 	tgt_accl = ego_data_out_list[0].accl;
+// 	tgt_alpha = ego_data_out_list[0].alpha;
+
+// 	V_old = V_now;
+// 	W_old = W_now;
+
+// 	V_now = ego_data_in.v;
+// 	W_now = ego_data_in.w;
+// 	acc = ego_data_in.accl;
+// 	alpha = ego_data_in.alpha;
+// 	angle = ego_data_out_list[0].ang;
+// 	img_distance = ego_data_in.dist;
+
+	ego_data_in.accl = ego_data_out.accl;
+	ego_data_in.alpha = ego_data_out.alpha;
+//	ego_data_in.ang = ego_data_out.ang;
+//	ego_data_in.dist = ego_data_out.dist;
+	ego_data_in.pivot_state = ego_data_out.pivot_state;
+	ego_data_in.sla_param = ego_data_out.sla_param;
+	ego_data_in.state = ego_data_out.state;
+	ego_data_in.v = ego_data_out.v;
+	ego_data_in.w = ego_data_out.w;
+	ego_data_in.sla_param.state = ego_data_out.sla_param.state;
+	ego_data_in.sla_param.counter = ego_data_out.sla_param.counter;
+	ego_data_in.sla_param.state = ego_data_out.sla_param.state;
+
+	ego_data_in.img_ang = ego_data_out.img_ang;
+	ego_data_in.img_dist = ego_data_out.img_dist;
+
+	tgt_v_now = ego_data_out.v;
+	tgt_w_now = ego_data_out.w;
+	tgt_accl = ego_data_out.accl;
+	tgt_alpha = ego_data_out.alpha;
+
+	V_old = V_now;
+	W_old = W_now;
+
+	V_now = ego_data_in.v;
+	W_now = ego_data_in.w;
+	acc = ego_data_in.accl;
+	alpha = ego_data_in.alpha;
+	angle = ego_data_out.ang;
+	img_distance = ego_data_in.dist;
 
 	enc_to_vel();
+	errorVelocity();
 
 	if (enableSystemIdentification) {
 

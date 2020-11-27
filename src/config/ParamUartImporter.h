@@ -45,11 +45,11 @@ void set_param_map(int tgt_type, float v) {
 	int id = 0;
 	if (v == 500) {
 		id = 1050432;
-		set_param_from_large(tgt_type, id);
+		set_param_from_normal(tgt_type, id);
 		return;
 	} else if (v == 1000) {
 		id = 1050816;
-		set_param_from_large(tgt_type, id);
+		set_param_from_normal(tgt_type, id);
 		return;
 	} else if (v == 1500) {
 		id = 1051200;
@@ -82,6 +82,6 @@ void set_param_map(int tgt_type, float v) {
 	} else if (v == 2800) {
 		id = 1055680;
 	}
-	set_param_from_normal(tgt_type, id);
+	set_param_from_large(tgt_type, id);
 }
 #endif

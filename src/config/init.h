@@ -8,9 +8,9 @@
 #ifndef INIT_H_
 #define INIT_H_
 
-volatile void cmt_wait(int t) {
+volatile void cmt_wait(float t) {
 	timer = 0;
-	while (timer != (CMT_CYCLE / 1000) * t) {
+	while (timer != (int) (CMT_CYCLE / 1000 * t)) {
 	}
 }
 

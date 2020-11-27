@@ -240,6 +240,37 @@ void resetData2() {
 	C_old.s = C_old.v = C_old.g = 0;
 }
 
+void reset_tgt_data() {
+	target_data.accl = 0;
+	target_data.alpha = 0;
+	target_data.decel = 0;
+	target_data.end_v = 0;
+	target_data.end_w = 0;
+	target_data.tgt_angle = 0;
+	target_data.tgt_dist = 0;
+	target_data.v_max = 0;
+	target_data.w_max = 0;
+}
+
+void reset_ego_data() {
+	ego_data_in.accl = 0;
+	ego_data_in.alpha = 0;
+	ego_data_in.ang = 0;
+	ego_data_in.dist = 0;
+	ego_data_in.pivot_state = 0;
+	ego_data_in.sla_param.base_alpha = 0;
+	ego_data_in.sla_param.base_time = 0;
+	ego_data_in.sla_param.counter = 0;
+	ego_data_in.sla_param.limit_time_count = 0;
+	ego_data_in.sla_param.pow_n = 0;
+	ego_data_in.sla_param.state = 0;
+	ego_data_in.state = 0;
+	ego_data_in.img_ang = 0;
+	ego_data_in.img_dist = 0;
+	ego_data_in.v = 0;
+	ego_data_in.w = 0;
+}
+
 void resetAllData() {
 	ang = 0;
 	angle = 0;
@@ -252,6 +283,9 @@ void resetAllData() {
 	alpha = 0;
 	fail = 1;
 	dia = 0;
+
+	reset_tgt_data();
+	reset_ego_data();
 	globalSkipFront = false;
 	Velocity.error_now = 0;
 	Velocity.error_old = 0;
@@ -295,17 +329,16 @@ void mtu_start() {
 	GPT.GTSTR.BIT.CST0 = GPT.GTSTR.BIT.CST1 = 1;
 }
 void mtu_stop() {
-	enablePWM = false;
+	reset_ego_data();
 	cmt_wait(25);
+	GPT.GTSTR.BIT.CST0 = GPT.GTSTR.BIT.CST1 = 0;
+	cmt_wait(5);
 	GPT0.GTCCRA = GPT0.GTCCRC = GPT1.GTCCRA = GPT1.GTCCRC = 0;
-	V_now = 0;
-	W_now = 0;
+	enablePWM = false;
 	resetGyroParam();
 	resetAngleParam();
 	resetOmegaParam();
 	resetData2();
-	cmt_wait(5);
-	GPT.GTSTR.BIT.CST0 = GPT.GTSTR.BIT.CST1 = 0;
 //	stopVacume();
 	ledOn = 0;
 }
@@ -863,35 +896,36 @@ void logOutPut() {
 	globalState = PIVOT;
 	while (Swich == 1)
 		;
-	myprintf("t v_img v_rel ang_img dury_l duty_r battery LS45 RS45 FrontErr ");
+	myprintf("t,v_img,v_rel,ang_img,dury_l,duty_r,battery,LS45,RS45,FrontErr,");
 	cmt_wait(1);
-	myprintf("FrontSen settleGyro W_now angle V_Enc.r V_Enc.l alpha px2 feadforward_para_l feadforward_para_r ");
+	myprintf("FrontSen,settleGyro,W_now,angle,V_Enc.r,V_Enc.l,alpha,px2,feadforward_para_l,feadforward_para_r,");
 	cmt_wait(1);
-	myprintf("LS2 RS2 sen_l2 sen_r2 C.g C.s C.v globalState Se2.error_now tmpLeftRef tmpLeftRef90 distance ");
+	myprintf("LS2,RS2,sen_l2,sen_r2,C.g,C.s,C.v,globalState,Se2.error_now,tmpLeftRef,tmpLeftRef90,distance,");
 	cmt_wait(1);
-	myprintf("img_distance C.angles img_dist_l img_dist_r\r\n");
+	myprintf("img_distance,C.angles,img_ang,img_dist\r\n");
 	cmt_wait(1);
+	float wait_time=0.5;
 	for (c = 0; c < L_Length; c++) {
-		myprintf("%d %f %f %f", c, log1[c], log3[c], log4[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f", log5[c], log6[c], log7[c], log8[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f", log9[c], logs10[c], log11[c], log12[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f %f %f", log13[c], log14[c], log15[c], log16[c],
+		myprintf("%d,%f,%f,%f", c, log1[c], log3[c], log4[c]);
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f", log5[c], log6[c], log7[c], log8[c]);
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f", log9[c], logs10[c], log11[c], log12[c]);
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f,%f,%f", log13[c], log14[c], log15[c], log16[c],
 				log17[c], log18[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f %f %f", log19[c], log20[c], log21[c], log22[c],
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f,%f,%f", log19[c], log20[c], log21[c], log22[c],
 				log23[c], log24[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f %f", log25[c], log26[c], log27[c],
-				log28[c] * 100, log29[c]);
-		cmt_wait(1);
-		myprintf(" %f %f %f %f %f", log30[c], log31[c], log32[c], log33[c],
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f,%f", log25[c], log26[c], log27[c],
+				log28[c], log29[c]);
+		cmt_wait(wait_time);
+		myprintf(",%f,%f,%f,%f,%f", log30[c], log31[c], log32[c], log33[c],
 				log34[c]);
-		cmt_wait(1);
-		myprintf(" %f %f\r\n", log35[c], log36[c]);
-		cmt_wait(1);
+		cmt_wait(wait_time);
+		myprintf(",%f,%f\r\n", log35[c], log36[c]);
+		cmt_wait(wait_time);
 	}
 	globalState = STRAIGHT;
 }

@@ -39,7 +39,7 @@ void testRun() {
 	float velocity = test_max_v;
 	float accele = test_acc;
 	float diaccele = test_acc;
-	float vMax = 100;
+	float vMax = STOP_VELOCITY;
 
 	gyroZeroCheck(true);
 	cmt_wait(500);
@@ -434,7 +434,7 @@ void testNormalSlalom() {
 			}
 		}
 		cc = 0;
-		realRun(vMax, accele, diaccele, 180.0 * 1, 50, NULL_FILTER);
+		realRun(vMax, accele, diaccele, 180.0 * 1, 5, NULL_FILTER);
 	}
 	C_old.g = 0;
 	C_old.s = 0;
@@ -685,7 +685,7 @@ void searchMode(char X, char Y) {
 		return;
 	}
 	cmt_wait(500);
-	roll(L, 180, 5, 30);
+	gyroRollTest(L, 180, 5, 30);
 	x1 = x;
 	y1 = y;
 	now_dir = direction(now_dir, Back);

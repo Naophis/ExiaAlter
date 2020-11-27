@@ -4,6 +4,7 @@
 #include <string.h>
 #include "machine.h"
 #include <mathf.h>
+#include "gen_code/mpc_tgt_calc.h"
 #include "config/defines.h"
 #include "config/Table.h"
 
@@ -42,6 +43,7 @@
 #include "Action.h"
 #include "OperationSystem.h"
 #include "config/SerialMapper.h"
+
 
 volatile void mtu6A() {
 	PORTD.PODR.BIT.B7 = 1;
@@ -126,8 +128,8 @@ volatile void cmt() {
 			log32[logs] = distance;
 			log33[logs] = img_distance;
 			log34[logs] = C.angles;
-			log35[logs] = img_dist_l;
-			log36[logs] = img_dist_r;
+			log35[logs] = ego_data_in.img_ang;
+			log36[logs] = ego_data_in.img_dist;
 
 			logs++;
 		}

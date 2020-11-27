@@ -703,6 +703,8 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 	map[0][0] |= 0xf0;
 	updateDist(GoalX, GoalY, 0, isFull);
 //	back(-100, -2000, 60, 0);
+	realRun(-100, -2000, 2000, 60, 0, REAL_RUN_FILTER);
+
 	gyroZeroCheck(false);
 	if (velocity >= 1000) {
 		sensingMode = SearchMode;
@@ -917,7 +919,7 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 				if (Front_SEN.now > wallhosei) {
 					fanMode = CtrlFan2;
 					frontCtrl();
-					realRun(velocity, acc, diac, 100, 100, NULL_FILTER);
+					realRun(velocity, acc, diac, 100, STOP_VELOCITY, NULL_FILTER);
 					fanMode = CtrlFan2;
 					mtu_stop();
 					gyroRollTest(L, 180, 60, 100);
@@ -948,7 +950,7 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 				} else {
 					realRun(velocity, acc, diac, 115, 25, NULL_FILTER);
 					mtu_stop();
-					gyroRoll(R, 180, 60, 80);
+					gyroRollTest(R, 180, 60, 80);
 					if (isStepped(firstGoalX, firstGoalY)) {
 						if (nextMotion == Back && !lock
 								&& !(isStepped(GoalX, GoalY)
@@ -992,7 +994,7 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 //		calibrateRun(R);
 //	} else {
 //		gyroRollTest(L, 180, 60, 100);
-//		back(-100, -diac / 500, 30, 1);
+//		-100, -diac / 500, 30, 1);
 //	}
 
 	V_now = 0;

@@ -3,6 +3,15 @@
 
 typedef struct
 {
+    float x;
+    float y;
+    float v;
+    float theta;
+} t_trajectory_point;
+#define TRAJECTORY_POINT_SIZE 1000
+
+typedef struct
+{
     float v_max;
     float end_v;
     float accl;
@@ -12,6 +21,8 @@ typedef struct
     float alpha;
     float tgt_dist;
     float tgt_angle;
+    t_trajectory_point trajectory_point[TRAJECTORY_POINT_SIZE];
+    int trajectory_point_size;
 } t_tgt;
 
 typedef struct
@@ -26,15 +37,29 @@ typedef struct
 
 typedef struct
 {
+    float x;
+    float y;
+    float theta;
+    float v;
+    float slip_angle;
+} t_point;
+
+typedef struct
+{
     float v;
     float accl;
     float w;
     float alpha;
     float dist;
     float ang;
+    float img_dist;
+    float img_ang;
     t_slalom sla_param;
     char state;
     char pivot_state;
+    t_point ideal_point;
+    t_point slip_point;
+    t_point kanayama_point;
 } t_ego;
 
 typedef struct
@@ -54,9 +79,9 @@ typedef struct
 typedef enum
 {
     NONE_MODE = 0,
-    ST_RUN = 1,
+    ST_RUN = 3,
     PIVOT_TURN = 2,
-    SLAROM_RUN = 3
+    SLAROM_RUN = 1
 } RUN_MODE;
 
 #endif

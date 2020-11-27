@@ -10,10 +10,9 @@ Simulink.importExternalCTypes('../include/bus.h');
 dt = 0.001/4;
 
 test_mode = 0; % straight
-%test_mode = 1; % slalom
+test_mode = 1; % slalom
 % test_mode = 2; % pivot
-
-test_mode = 3; % back_straight
+% test_mode = 3; % back_straight
 
 %default
 sla.base_alpha = 0;
@@ -32,7 +31,7 @@ if test_mode == 0
     w_max = 0;
     end_w = 0;
     param_alpha = 0;
-    tgt_dist = 180*16;
+    tgt_dist = 180 * 16;
     tgt_angle = 0;
 
     % ego
@@ -87,7 +86,7 @@ if test_mode == 1
     sla.limit_time_count = sla.base_time * 2 / dt;
     sla.pow_n = 4;
     sla.state = 0;
-    sla.counter = int32(1);
+    sla.counter = int32(0);
 
 end
 
@@ -100,7 +99,7 @@ if test_mode == 2
     decel = 0;
     tgt_angle = 90 * 2 * pi / 360;
 
-    param_alpha = 10;
+    param_alpha = -10;
     w_max = 2.5;
     end_w = 0.1;
     tgt_dist = 0;
@@ -120,8 +119,6 @@ if test_mode == 2
     ego_state = int8(0);
 
 end
-
-
 
 if test_mode == 3
     % tgt
@@ -156,5 +153,7 @@ if test_mode == 3
     sla.counter = int32(1);
 
 end
+
+predict_list = [1:10];
 
 cd(home);
