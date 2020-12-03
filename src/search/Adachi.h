@@ -857,8 +857,8 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 		}
 
 		char tmp = setNewPositionDummy(x, y, nextDirection);
-		 tmp = 0;
-		 known =false;
+		tmp = 0;
+		known =false;
 		if (!goaled && tmp && nextMotion != Back) {
 			known = true;
 			if (p == 0 && path_s[0] == 0) {
@@ -922,7 +922,7 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 					realRun(velocity, acc, diac, 100, STOP_VELOCITY, NULL_FILTER);
 					fanMode = CtrlFan2;
 					mtu_stop();
-					gyroRollTest(L, 180, 60, 100);
+					gyroRollTest(L, 180, 10, 70);
 					if (isStepped(firstGoalX, firstGoalY)) {
 						if (nextMotion == Back && !lock
 								&& !(isStepped(GoalX, GoalY)
@@ -950,7 +950,7 @@ char Adachi2(int GoalX, int GoalY, char Zen, char isFull, char Mode) {
 				} else {
 					realRun(velocity, acc, diac, 115, 25, NULL_FILTER);
 					mtu_stop();
-					gyroRollTest(R, 180, 60, 80);
+					gyroRollTest(L, 180, 10, 70);
 					if (isStepped(firstGoalX, firstGoalY)) {
 						if (nextMotion == Back && !lock
 								&& !(isStepped(GoalX, GoalY)

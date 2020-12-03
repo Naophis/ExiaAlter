@@ -32,7 +32,6 @@ void queClear() {
 	queue_num = 0;
 }
 int enqueue(char enq_data) {
-	myprintf("%d %d\r\n", queue_head, queue_num, enq_data);
 	if (enq_data == 92) {
 		return 999;
 	}

@@ -60,6 +60,11 @@ char wallOff(char RorL, char ctrl) {
 	Distance.error_old = 0;
 	Distance.error_delta = 0;
 
+	ego_data_in.state = 0;
+	ego_data_in.img_ang = 0;
+	ego_data_in.img_dist = 0;
+	mpc_tgt_calc_mode = (int32_T) ST_RUN;
+
 	if (globalSkipFront) {
 		return true;
 	}
@@ -73,6 +78,11 @@ char wallOff(char RorL, char ctrl) {
 	angle = 0;
 	distance = 0;
 	img_distance = 0;
+
+	ego_data_in.state = 0;
+	ego_data_in.img_ang = 0;
+	ego_data_in.img_dist = 0;
+	mpc_tgt_calc_mode = (int32_T) ST_RUN;
 
 	if (RorL == R) {
 		walloff1(R);

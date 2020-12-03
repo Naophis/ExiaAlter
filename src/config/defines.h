@@ -99,6 +99,11 @@ volatile unsigned short x = 0, y = 0;		//座標保持変数
 volatile unsigned char path_s[pathLength];	//直進パス
 volatile unsigned char path_t[pathLength];	//ターンパス
 
+volatile float tgt_v_now_ff = 0;
+volatile float tgt_w_now_ff = 0;
+volatile float tgt_accl_ff = 0;
+volatile float tgt_alpha_ff = 0;
+
 volatile unsigned int Value = 255;	//最小の評価値
 volatile unsigned char next_move = North;
 volatile unsigned char next_dir = North;
@@ -461,6 +466,7 @@ volatile t_tgt target_data;
 volatile t_ego ego_data_in;
 volatile int32_T mpc_tgt_calc_mode;
 volatile t_ego ego_data_out;
+volatile t_ego ego_data_out2;
 
 #define PREDICT_SIZE 1
 volatile t_tgt target_data_list[PREDICT_SIZE];

@@ -70,6 +70,7 @@ typedef struct {
 	float v;
 	float v2;
 	float w;
+	float y_diff;
 } t_Control;
 volatile t_Control C, C_old;
 

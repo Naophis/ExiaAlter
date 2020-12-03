@@ -900,11 +900,11 @@ void logOutPut() {
 	cmt_wait(1);
 	myprintf("FrontSen,settleGyro,W_now,angle,V_Enc.r,V_Enc.l,alpha,px2,feadforward_para_l,feadforward_para_r,");
 	cmt_wait(1);
-	myprintf("LS2,RS2,sen_l2,sen_r2,C.g,C.s,C.v,globalState,Se2.error_now,tmpLeftRef,tmpLeftRef90,distance,");
+	myprintf("LS2,RS2,sen_l2,sen_r2,C.g,C.s,C.v,globalState,C.y_diff,tmpLeftRef,tmpLeftRef90,distance,");
 	cmt_wait(1);
 	myprintf("img_distance,C.angles,img_ang,img_dist\r\n");
 	cmt_wait(1);
-	float wait_time=0.5;
+	float wait_time = 0.0025;
 	for (c = 0; c < L_Length; c++) {
 		myprintf("%d,%f,%f,%f", c, log1[c], log3[c], log4[c]);
 		cmt_wait(wait_time);

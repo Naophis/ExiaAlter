@@ -120,7 +120,7 @@ volatile void cmt() {
 			log26[logs] = C.s;
 			log27[logs] = C.v;
 			log28[logs] = globalState;
-			log29[logs] = Se2.error_now;
+			log29[logs] = C.y_diff ;
 
 			log30[logs] = tmpLeftRef;
 			log31[logs] = tmpLeftRef90;

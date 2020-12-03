@@ -146,7 +146,6 @@ char gyroRollTest(char RorL, float targetAng, float w_max, float al) {
 	cc = 1;
 	time = 0;
 	logs = 0;
-	char phase = 0;
 	float targetWo = RorL == L ? -Wo : Wo;
 
 	reset_tgt_data();
@@ -168,21 +167,6 @@ char gyroRollTest(char RorL, float targetAng, float w_max, float al) {
 		}
 	}
 
-//	globalState = PIVOT_END;
-//	mpc_tgt_calc_mode = (int32_T) ST_RUN;
-
-//	Gy.error_now = 0;
-//	Gy.error_old = 0;
-//	Gy.error_delta = 0;
-//	Angle.error_now = 0;
-//	Angle.error_old = 0;
-//	Angle.error_delta = 0;
-//	resetAngleParam();
-
-//	reset ego_data;
-
-//	C.g = 0;
-//	C.angles = 0;
 	cc = 0;
 	mtu_stop();
 	positionControlValueFlg = 0;
@@ -555,8 +539,6 @@ char asc2(float d, float d2) {
 char pararelMove(float v2, float diff, float length, char mode);
 char orignalRunDia(float v1, float v2, float ac, float diac, float dist,
 		char runtype) {
-	float d2;
-	char sequence = ACCELE;
 
 	globalState = DIA_STRAIGHT;
 
@@ -709,8 +691,6 @@ char orignalRunDia(float v1, float v2, float ac, float diac, float dist,
 
 char orignalRun(float v1, float v2, float ac, float diac, float dist,
 		char runtype) {
-	float d2;
-	char sequence = ACCELE;
 	errorOld_dia = errorOld_dia_side = 0;
 	targetVelocity = v2;
 	positionControlValueFlg = 1;
@@ -906,6 +886,20 @@ char runForWallOff(float vmax, float ACC, float dist, char control) {
 
 	char validate1 = dist >= 90;
 
+	target_data.accl = ACC;
+	target_data.alpha = 0;
+	target_data.decel = -ACC;
+	target_data.end_v = vmax;
+	target_data.end_w = 0;
+	target_data.tgt_angle = 0;
+	target_data.tgt_dist = dist;
+	target_data.v_max = vmax;
+	target_data.w_max = 0;
+	ego_data_in.state = 0;
+	ego_data_in.img_ang = 0;
+	ego_data_in.img_dist = 0;
+	mpc_tgt_calc_mode = (int32_T) ST_RUN;
+
 	while (true) {
 		if ((ABS(distance) >= ABS(dist))) {
 			// distance -= dist;
@@ -915,29 +909,10 @@ char runForWallOff(float vmax, float ACC, float dist, char control) {
 			gyroErrResetEnable = false;
 		}
 
-		if (ACC > 0) {
-			if (V_now < V_max) {
-			} else if (V_now >= V_max) {
-				ACC = 0;
-				acc = 0;
-				V_now = V_max;
-			}
-		} else if (ACC < 0) {
-			if (V_now > V_max) {
-			} else if (V_now <= V_max) {
-				ACC = 0;
-				acc = 0;
-				V_now = V_max;
-			}
-		}
 		if (bool4) {
 			if (bool2) {
 				if (checkSensor2Off(R, false)) {
 				} else {
-					// if (validate1 && distance < (dist / 2)) {
-					// 	continue;
-					// }
-
 					bool4 = false;
 					cmtMusic(G2_, 100);
 					distance = img_distance = 0;
@@ -951,9 +926,6 @@ char runForWallOff(float vmax, float ACC, float dist, char control) {
 			if (bool3) {
 				if (checkSensor2Off(L, false)) {
 				} else {
-					// if (validate1 && distance < (dist / 2)) {
-					// 	continue;
-					// }
 					bool4 = false;
 					cmtMusic(G2_, 100);
 					distance = img_distance = 0;

@@ -116,10 +116,12 @@ void setA(long key, long id, float val) {
 	cmtMusic(C3_, 20);
 }
 void assing(long id, float val) {
-	for (unsigned long i = FLASH_DF_BLOCK_1023; i >= FLASH_DF_BLOCK_10; i -=
-			0x40)
-		if (id >= i)
+	for (unsigned long i = FLASH_DF_BLOCK_130; i >= FLASH_DF_BLOCK_10; i -=	0x40){
+		if (id >= i){
 			setA(i, id, val);
+			break;
+		}
+	}
 }
 
 #endif /* SERIALMAPPER_H_ */

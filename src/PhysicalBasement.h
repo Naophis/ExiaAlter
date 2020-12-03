@@ -495,6 +495,11 @@ void errorVelocity(void) {
 			const char enableSPID = (char) (*(float *) 1049812);
 			float C_old2 = C_old.s;
 			C_old.s = C.s;
+
+			Gyro.Kp = interp_s_kp(ABS(tgt_v_now));
+			Gyro.Ki = interp_s_ki(ABS(tgt_v_now));
+			Gyro.Kd = interp_s_kd(ABS(tgt_v_now));
+
 			C.s = Sen.Kp * Se.error_now + Sen.Ki * Se.error_old
 					+ Sen.Kd * Se.error_delta;
 
@@ -695,8 +700,7 @@ float feadforward(char RorL) {
 		}
 	}
 
-	// return Mass * tgt_accl * tmp_wheel * Resist / (GEAR * Km * 1000);
-	return Mass * acc * tmp_wheel * Resist / (GEAR * Km * 1000);
+	return Mass * tgt_accl_ff * tmp_wheel * Resist / (GEAR * Km * 1000);
 }
 float feadforward_para(char RorL) {
 	float tmp_wheel = WHEEL;
@@ -707,25 +711,9 @@ float feadforward_para(char RorL) {
 		}
 	}
 	if (RorL == R) {
-		return Lm * (-tgt_alpha) * tmp_wheel * Resist / (GEAR * Km) / Tread;
+		return Lm * (-tgt_alpha_ff) * tmp_wheel * Resist / (GEAR * Km) / Tread;
 	}
-	return Lm * tgt_alpha * tmp_wheel * Resist / (GEAR * Km) / Tread;
-}
-
-float wheel_lm(char RorL) {
-	float tmp_wheel = WHEEL;
-
-	if (fanStart == true) {
-		if (fanMode != SearchRun) {
-			tmp_wheel = (*(float *) 1050060) / 2000;
-		}
-	}
-	if (RorL == R) {
-		return (rpmR - rpmR_old) / dt / 2 * Mass * tmp_wheel * tmp_wheel
-				* Resist / Km;
-	}
-	return (rpmL - rpmL_old) / dt / 2 * Mass * tmp_wheel * tmp_wheel * Resist
-			/ Km;
+	return Lm * tgt_alpha_ff * tmp_wheel * Resist / (GEAR * Km) / Tread;
 }
 
 float FF_calc(char RorL, float w, float al) {
@@ -745,10 +733,10 @@ float FF_calc(char RorL, float w, float al) {
 	float whrlm = 0;
 
 	if (RorL == R) {
-		rpm = (tgt_v_now / 1000 - Tread / 2 * tgt_w_now) / (60 * tmp_tire / 2)
+		rpm = (tgt_v_now_ff / 1000 - Tread / 2 * tgt_w_now_ff) / (60 * tmp_tire / 2)
 				* 1000;
 	} else {
-		rpm = (tgt_v_now / 1000 + Tread / 2 * tgt_w_now) / (60 * tmp_tire / 2)
+		rpm = (tgt_v_now_ff / 1000 + Tread / 2 * tgt_w_now_ff) / (60 * tmp_tire / 2)
 				* 1000;
 	}
 
@@ -814,11 +802,6 @@ float FB_velocity() {
 float FB_distance() {
 	float dist_before = (img_distance - distance);
 	return 0;
-//	Distance.error_now = (img_distance - distance);
-//	Distance.error_old += Distance.error_now;
-//	Distance.error_delta = Distance.error_now - dist_before;
-//	return (Dists.Kp * Distance.error_now + Dists.Ki * Distance.error_old
-//			+ Dists.Kd * Distance.error_delta);
 }
 
 float FB_calc_straight() {
@@ -830,12 +813,20 @@ float FB_calc_straight() {
 float FB_calc_pararell() {
 	float tmpC_s = C.s;
 	float tmpC_s2 = C.s2;
+	float y_diff = C.y_diff;
 	const float rate_limit = (*(float *) 1049512);
 	const float rate_limit_dia = (*(float *) 1049516);
 	const char rate_limit_override = (char) (*(float *) 1049520);
 
 	const float rate_jerk = (*(float *) 1049524);
 	const float rate_jerk_dia = (*(float *) 1049528);
+
+	const float diff_y_gain_p = (*(float *) 1050420);
+
+	C.y_diff = 0;
+	if(globalState==SLA_TURN){
+		C.y_diff = diff_y_gain_p * ego_data_out.trj_diff.y;
+	}
 
 	if (ABS(lastC_s - C.s) > rate_limit) {
 		tmpC_s = 0;
@@ -861,7 +852,7 @@ float FB_calc_pararell() {
 	if (gyroKeepZero) {
 		return C.s + C.s2;
 	}
-	return C.angles + C.g + tmpC_s + tmpC_s2;
+	return C.angles + C.g + tmpC_s + tmpC_s2 + C.y_diff;
 }
 
 void set_predict_tgt_data() {
@@ -967,70 +958,24 @@ void Physical_Basement(void) {
 
 	ego_data_in.ang = ang;
 	ego_data_in.dist = distance;
+	ego_data_in.slip_point.w = settleGyro;
+
+	target_data.accl_param.limit = *(float *) 1050412;
+	target_data.accl_param.n = *(float *) 1050416;
+	target_data.slip_gain = *(float *) 1050424;
 
 	// set_predict_tgt_data();
 
 	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data, &ego_data_in,
-			mpc_tgt_calc_mode, &ego_data_out);
+			mpc_tgt_calc_mode, 1, &ego_data_out);
 
-	// for (int i = 0; i < PREDICT_SIZE; i++) {
-	// 	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data_list[i],
-	// 			&ego_data_in_list[i], mpc_tgt_calc_mode, &ego_data_out_list[i]);
-	// 	if(i<PREDICT_SIZE-1){
-	// 		ego_data_in_list[i + 1].accl = ego_data_out_list[i].accl;
-	// 		ego_data_in_list[i + 1].alpha = ego_data_out_list[i].alpha;
-	// 		ego_data_in_list[i + 1].ang = ego_data_out_list[i].ang;
-	// 		ego_data_in_list[i + 1].dist = ego_data_out_list[i].dist;
-	// 		ego_data_in_list[i + 1].img_ang = ego_data_out_list[i].img_ang;
-	// 		ego_data_in_list[i + 1].img_dist = ego_data_out_list[i].img_dist;
-	// 		ego_data_in_list[i + 1].pivot_state = ego_data_out_list[i].pivot_state;
-	// 		ego_data_in_list[i + 1].sla_param.base_alpha =
-	// 			ego_data_out_list[i].sla_param.base_alpha;
-	// 		ego_data_in_list[i + 1].sla_param.base_time =
-	// 			ego_data_out_list[i].sla_param.base_time;
-	// 		ego_data_in_list[i + 1].sla_param.counter =
-	// 			ego_data_out_list[i].sla_param.counter;
-	// 		ego_data_in_list[i + 1].sla_param.limit_time_count =
-	// 			ego_data_out_list[i].sla_param.limit_time_count;
-	// 		ego_data_in_list[i + 1].sla_param.pow_n =
-	// 			ego_data_out_list[i].sla_param.pow_n;
-	// 		ego_data_in_list[i + 1].sla_param.state =
-	// 			ego_data_out_list[i].sla_param.state;
-	// 		ego_data_in_list[i + 1].v = ego_data_out_list[i].v;
-	// 		ego_data_in_list[i + 1].w = ego_data_out_list[i].w;
-	// 	}
-	// }
 
-// 	ego_data_in.accl = ego_data_out_list[0].accl;
-// 	ego_data_in.alpha = ego_data_out_list[0].alpha;
-// //	ego_data_in.ang = ego_data_out_list[0].ang;
-// //	ego_data_in.dist = ego_data_out_list[0].dist;
-// 	ego_data_in.pivot_state = ego_data_out_list[0].pivot_state;
-// 	ego_data_in.sla_param = ego_data_out_list[0].sla_param;
-// 	ego_data_in.state = ego_data_out_list[0].state;
-// 	ego_data_in.v = ego_data_out_list[0].v;
-// 	ego_data_in.w = ego_data_out_list[0].w;
-// 	ego_data_in.sla_param.state = ego_data_out_list[0].sla_param.state;
-// 	ego_data_in.sla_param.counter = ego_data_out_list[0].sla_param.counter;
-// 	ego_data_in.sla_param.state = ego_data_out_list[0].sla_param.state;
-
-// 	ego_data_in.img_ang = ego_data_out_list[0].img_ang;
-// 	ego_data_in.img_dist = ego_data_out_list[0].img_dist;
-
-// 	tgt_v_now = ego_data_out_list[0].v;
-// 	tgt_w_now = ego_data_out_list[0].w;
-// 	tgt_accl = ego_data_out_list[0].accl;
-// 	tgt_alpha = ego_data_out_list[0].alpha;
-
-// 	V_old = V_now;
-// 	W_old = W_now;
-
-// 	V_now = ego_data_in.v;
-// 	W_now = ego_data_in.w;
-// 	acc = ego_data_in.accl;
-// 	alpha = ego_data_in.alpha;
-// 	angle = ego_data_out_list[0].ang;
-// 	img_distance = ego_data_in.dist;
+	int predict_time = (int) (*(float *) 1050428);
+	if (predict_time < 1) {
+		predict_time = 1;
+	}
+	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data, &ego_data_in,
+			mpc_tgt_calc_mode, (int)predict_time, &ego_data_out2);
 
 	ego_data_in.accl = ego_data_out.accl;
 	ego_data_in.alpha = ego_data_out.alpha;
@@ -1048,6 +993,8 @@ void Physical_Basement(void) {
 	ego_data_in.img_ang = ego_data_out.img_ang;
 	ego_data_in.img_dist = ego_data_out.img_dist;
 
+	ego_data_in.slip_point.slip_angle = ego_data_out.slip_point.slip_angle;
+
 	tgt_v_now = ego_data_out.v;
 	tgt_w_now = ego_data_out.w;
 	tgt_accl = ego_data_out.accl;
@@ -1062,6 +1009,11 @@ void Physical_Basement(void) {
 	alpha = ego_data_in.alpha;
 	angle = ego_data_out.ang;
 	img_distance = ego_data_in.dist;
+
+	tgt_v_now_ff = ego_data_out2.v;
+	tgt_w_now_ff = ego_data_out2.w;
+	tgt_accl_ff = ego_data_out2.accl;
+	tgt_alpha_ff = ego_data_out2.alpha;
 
 	enc_to_vel();
 	errorVelocity();

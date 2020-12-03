@@ -178,4 +178,89 @@ float interp_w_kd (float v){
 	return INTERP(gain_v[i - 1], gain_v[i], gain_val[i - 1], gain_val[i], v);
 }
 
+float interp_s_kp (float v){
+    float gain_v[linergain];
+    float gain_val[linergain];
+	gain_v[0] = (*(float *)1050312);
+	gain_v[1] = (*(float *)1050316);
+	gain_v[2] = (*(float *)1050320);
+	gain_v[3] = (*(float *)1050324);
+	gain_v[4] = (*(float *)1050328);
+
+	gain_val[0] = (*(float *)1050252);
+	gain_val[1] = (*(float *)1050264);
+	gain_val[2] = (*(float *)1050276);
+	gain_val[3] = (*(float *)1050288);
+	gain_val[4] = (*(float *)1050300);
+	if(v<=gain_v[0]){
+		return gain_val[0];
+	}
+	if(v>=gain_v[4]){
+		return gain_val[4];
+	}
+	int i=0;
+	for(i=1;i<linergain;i++){
+			if(gain_v[i]>=v)
+				break;
+	}
+	return INTERP(gain_v[i - 1], gain_v[i], gain_val[i - 1], gain_val[i], v);
+}
+float interp_s_ki (float v){
+    float gain_v[linergain];
+    float gain_val[linergain];
+	gain_v[0] = (*(float *)1050312);
+	gain_v[1] = (*(float *)1050316);
+	gain_v[2] = (*(float *)1050320);
+	gain_v[3] = (*(float *)1050324);
+	gain_v[4] = (*(float *)1050328);
+
+	gain_val[0] = (*(float *)1050256);
+	gain_val[1] = (*(float *)1050268);
+	gain_val[2] = (*(float *)1050280);
+	gain_val[3] = (*(float *)1050292);
+	gain_val[4] = (*(float *)1050304);
+	if(v<=gain_v[0]){
+		return gain_val[0];
+	}
+	if(v>=gain_v[4]){
+		return gain_val[4];
+	}
+	int i=0;
+	for(i=1;i<linergain;i++){
+			if(gain_v[i]>=v)
+				break;
+	}
+	return INTERP(gain_v[i - 1], gain_v[i], gain_val[i - 1], gain_val[i], v);
+}
+
+float interp_s_kd (float v){
+    float gain_v[linergain];
+    float gain_val[linergain];
+	gain_v[0] = (*(float *)1050312);
+	gain_v[1] = (*(float *)1050316);
+	gain_v[2] = (*(float *)1050320);
+	gain_v[3] = (*(float *)1050324);
+	gain_v[4] = (*(float *)1050328);
+
+	gain_val[0] = (*(float *)1050260);
+	gain_val[1] = (*(float *)1050272);
+	gain_val[2] = (*(float *)1050284);
+	gain_val[3] = (*(float *)1050296);
+	gain_val[4] = (*(float *)1050308);
+	if(v<=gain_v[0]){
+		return gain_val[0];
+	}
+	if(v>=gain_v[4]){
+		return gain_val[4];
+	}
+	int i=0;
+	for(i=1;i<linergain;i++){
+			if(gain_v[i]>=v)
+				break;
+	}
+	return INTERP(gain_v[i - 1], gain_v[i], gain_val[i - 1], gain_val[i], v);
+}
+
+
+
 #endif /* CALC_INTERP_H_ */
