@@ -9,3 +9,4 @@ slprj/
 RUN_MODE.m
 test.csv
 *.mat
+.original

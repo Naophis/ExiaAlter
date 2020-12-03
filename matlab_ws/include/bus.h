@@ -5,10 +5,41 @@ typedef struct
 {
     float x;
     float y;
-    float v;
+    float w;
     float theta;
+    float dist;
 } t_trajectory_point;
-#define TRAJECTORY_POINT_SIZE 1000
+
+typedef struct
+{
+    float x;
+    float y;
+    float theta;
+    float v;
+    float w;
+} t_kanayama_tgt_point;
+
+typedef struct
+{
+    float x;
+    float y;
+    float theta;
+} t_trajectory_diff;
+
+typedef struct
+{
+    float k_x;
+    float k_y;
+    float k_theta;
+} t_kanayama_gain;
+
+#define TRAJECTORY_POINT_SIZE 15
+
+typedef struct
+{
+    float limit;
+    float n;
+} t_accl_param;
 
 typedef struct
 {
@@ -21,8 +52,11 @@ typedef struct
     float alpha;
     float tgt_dist;
     float tgt_angle;
-    t_trajectory_point trajectory_point[TRAJECTORY_POINT_SIZE];
+    // t_trajectory_point trajectory_point[TRAJECTORY_POINT_SIZE];
     int trajectory_point_size;
+    // t_kanayama_gain kanayama_gain;
+    t_accl_param accl_param;
+    float slip_gain;
 } t_tgt;
 
 typedef struct
@@ -41,6 +75,7 @@ typedef struct
     float y;
     float theta;
     float v;
+    float w;
     float slip_angle;
 } t_point;
 
@@ -59,7 +94,8 @@ typedef struct
     char pivot_state;
     t_point ideal_point;
     t_point slip_point;
-    t_point kanayama_point;
+    t_kanayama_tgt_point kanayama_point;
+    t_trajectory_diff trj_diff;
 } t_ego;
 
 typedef struct
@@ -83,5 +119,37 @@ typedef enum
     PIVOT_TURN = 2,
     SLAROM_RUN = 1
 } RUN_MODE;
+
+typedef enum
+{
+    START_WAITING = 0,
+    END_WAITING = 1
+} WALL_OFF_MODE;
+
+typedef struct
+{
+    char state;
+    float Front;
+    float L45;
+    float R45;
+    float L90;
+    float R90;
+    char turn_mode;
+    char is_dia;
+} t_wall_off_input;
+
+typedef struct
+{
+    float th_Front;
+    float th_L45;
+    float th_R45;
+    float th_L90;
+    float th_R90;
+} t_wall_off_th;
+
+typedef struct
+{
+    float front_dist;
+} t_wall_off_th;
 
 #endif
