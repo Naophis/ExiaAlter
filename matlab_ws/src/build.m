@@ -10,7 +10,9 @@ function build(tgt_model_name)
 
     mkdir('build');
     mkdir(tgt_dir_name);
-
+    cd(tgt_dir_name);
+    gen_code_dir = pwd;
+    cd ..;
     tgtdir = strcat('../../', tgt_dir_name);
 
     cd build;
@@ -33,10 +35,19 @@ function build(tgt_model_name)
     end
 
     cd(tgt_name);
-
+   
     copyfile('*.c', tgtdir);
     copyfile('*.h', tgtdir);
 
+    cd(fileparts(build_home));
+    cd ..;
+    cd include;
+    copyfile('*.h', gen_code_dir);
+    
+    cd(gen_code_dir);
+    delete ert_main.c   
+    
+    copyfile('*.*', '../../../src/gen_code');
     cd(home);
 
 end

@@ -1,15 +1,15 @@
 % ego
-Large = 1; Orval = 2; Dia45 = 3; Dia135 = 4; Dia90 = 5;
+Large = 1; Orval = 2; Dia45 = 3; Dia135 = 4; Dia90 = 5; Dia180 = 6;
 ego_v = 2050;
-radius = 77;
-sla.pow_n = 2;
-target_angle = 135;
-turn_mode = Dia135;
+radius =100;
+sla.pow_n = 4;
+target_angle = 90;
+turn_mode = Dia90;
 dt = 0.001/4;
 is_dia_mode = true;
 
-tmp_x = 31;
-tmp_y = 31;
+tmp_x = 0;
+tmp_y = 0;
 
 %start_offset_idx=6;
 %end_offset_idx=6;
@@ -55,6 +55,14 @@ tmp_x_list(1) = tmp_x;
 tmp_y_list(1) = tmp_y;
 
 for i = 2:1:sla.limit_time_count + 1
+    
+    
+    if turn_mode == Dia90
+       if tmp_x_list(i-1)<=0 && i>10
+          break; 
+       end
+    end
+    
     %tmp_alpha = alphaTemp * calc_neipire(dt * (i - 1), sla.base_time, sla.pow_n);
     tmp_alpha = alphaTemp * calc_neipire(dt * (i - 1 + start_offset_idx), sla.base_time, sla.pow_n);
     tmp_w = tmp_w + tmp_alpha * dt;
@@ -65,54 +73,165 @@ for i = 2:1:sla.limit_time_count + 1
     tmp_y_list(i) = (tmp_y);
     tmp_w_list(i) = (tmp_w);
 
+    
     if i > sla.limit_time_count - start_offset_idx - end_offset_idx
         break;
     end
 
 end
 
-figure(1);
-plot(tmp_x_list, tmp_y_list, '-b');
+fig1 = figure(1);
+clf(fig1);
 G = 9.81;
 fprintf('pos(x,y,rad,deg,max_G) = (%0.8f, %0.8f, %0.8f, %0.8f, %0.8fG)\r\n', tmp_x, tmp_y, tmp_theta, tmp_theta * 180 / pi, max(tmp_w_list)^2 * (radius / 1000) / G);
 
-if turn_mode == Large || turn_mode == Orval
+l_start = 0;
+l_end = 0;
+
+if turn_mode == Large
     fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 180 - tmp_x, 180 - tmp_y);
+    [l_start, l_end] = calc_offset_dist(tmp_x_list, tmp_y_list, 180, 180, target_angle);
+    plot(tmp_x_list + l_start, tmp_y_list);
+    hold on;
+    plot([0 l_start], [0 0]);
+    l_end_x0 = tmp_x_list(end) + l_start;
+    l_end_x1 = tmp_x_list(end) + l_start;
+    l_end_y0 = tmp_y_list(end);
+    l_end_y1 = tmp_y_list(end) + l_end;
+    plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+    hold off;
+elseif turn_mode == Orval
+    fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 180 - tmp_x, 180 - tmp_y);
+    l_start = 10;
+    l_end = l_start - tmp_x_list(end);
+    plot(tmp_x_list + l_start, tmp_y_list);
+    hold on;
+    plot([0 l_start], [0 0]);
+    l_end_x0 = tmp_x_list(end);
+    l_end_x1 = tmp_x_list(end) + l_end;
+    l_end_y0 = tmp_y_list(end);
+    l_end_y1 = tmp_y_list(end);
+    plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+    hold off;
+
 elseif turn_mode == Dia45
-    fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 180 - tmp_x, 90 - tmp_y);
-    s = sqrt((180 - tmp_x)^2 + (90 - tmp_y));
-    fprintf('end_pos(s) = (%0.8f)\r\n', s);
+
+    if ~is_dia_mode
+        [l_start, l_end] = calc_offset_dist(tmp_x_list, tmp_y_list, 180, 90, target_angle);
+        plot(tmp_x_list + l_start, tmp_y_list);
+        hold on;
+        plot([0 l_start], [0 0]);
+        l_end_x0 = tmp_x_list(end) + l_start;
+        l_end_x1 = tmp_x_list(end) + l_start + l_end * sin(pi / 4);
+        l_end_y0 = tmp_y_list(end);
+        l_end_y1 = tmp_y_list(end) + l_end * sin(pi / 4);
+        plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+        hold off;
+    else
+        l_start = (90 - tmp_x_list(end)) / sin(pi / 4);
+        l_end = 180 - tmp_y_list(end) - l_start * sin(pi / 4);
+
+        plot(tmp_x_list + l_start * sin(pi / 4), tmp_y_list + l_start * sin(pi / 4));
+        hold on;
+        l_start_x1 = l_start * sin(pi / 4);
+        l_start_y1 = l_start * sin(pi / 4);
+        plot([0 l_start_x1], [0 l_start_y1]);
+        l_end_x0 = tmp_x_list(end) + l_start * sin(pi / 4);
+        l_end_x1 = tmp_x_list(end) + l_start * sin(pi / 4);
+        l_end_y0 = tmp_y_list(end) + l_start * sin(pi / 4);
+        l_end_y1 = tmp_y_list(end) + l_start * sin(pi / 4) + l_end;
+        plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+        hold off;
+    end
+
 elseif turn_mode == Dia135
 
     if ~is_dia_mode
-        fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 90 - tmp_x, 180 - tmp_y);
-        fprintf('start_x = %0.8f\r\n', 270 - tmp_y - tmp_x);
-        s = sqrt((90 - tmp_x)^2 + (180 - tmp_y));
-        fprintf('end_pos(s) = (%0.8f)\r\n', s);
+        [l_start, l_end] = calc_offset_dist(tmp_x_list, tmp_y_list, 90, 180, target_angle);
+        plot(tmp_x_list + l_start, tmp_y_list);
+        hold on;
+        plot([0 l_start], [0 0]);
+        l_end_x0 = tmp_x_list(end) + l_start;
+        l_end_x1 = tmp_x_list(end) + l_start - l_end * sin(pi / 4);
+        l_end_y0 = tmp_y_list(end);
+        l_end_y1 = tmp_y_list(end) + l_end * sin(pi / 4);
+        plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+        hold off;
     else
-        fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 90 + tmp_x, 180 - tmp_y);
-        % s = sqrt((90 - tmp_x)^2 + (180 - tmp_y));
-        % fprintf('end_pos(s) = (%0.8f)\r\n', s);
+        l_start = (180- tmp_y_list(end))/sin(pi/4);
+        l_end =abs( -90 - tmp_x_list(end)-l_start*sin(pi/4));
+
+        plot(tmp_x_list + l_start * sin(pi / 4), tmp_y_list + l_start * sin(pi / 4));
+        hold on;
+        l_start_x1 = l_start * sin(pi / 4);
+        l_start_y1 = l_start * sin(pi / 4);
+        plot([0 l_start_x1], [0 l_start_y1]);
+        l_end_x0 = tmp_x_list(end) + l_start * sin(pi / 4);
+        l_end_x1 = tmp_x_list(end) + l_start * sin(pi / 4)-l_end;
+        l_end_y0 = tmp_y_list(end) + l_start * sin(pi / 4);
+        l_end_y1 = tmp_y_list(end) + l_start * sin(pi / 4) ;
+        plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+        hold off;
     end
 
 elseif turn_mode == Dia90
 
-    if ~is_dia_mode
-        fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 90 - tmp_x, 180 - tmp_y);
-        fprintf('start_x = %0.8f\r\n', 270 - tmp_y - tmp_x);
-        s = sqrt((90 - tmp_x)^2 + (180 - tmp_y));
-        fprintf('end_pos(s) = (%0.8f)\r\n', s);
-    else
-        fprintf('end_pos(x,y) = (%0.8f, %0.8f)\r\n', 90 + tmp_x, 180 - tmp_y);
-        % s = sqrt((90 - tmp_x)^2 + (180 - tmp_y));
-        % fprintf('end_pos(s) = (%0.8f)\r\n', s);
-    end
+    l_end = (180- tmp_y_list(end-1))*sin(pi/4);
+    l_start =abs(0 - tmp_x_list(end-1)+l_end);
+
+    plot(tmp_x_list + l_start * sin(pi / 4), tmp_y_list + l_start * sin(pi / 4));
+  %  plot(tmp_x_list ,tmp_y_list );
+    hold on;
+    l_start_x1 = l_start * sin(pi / 4);
+    l_start_y1 = l_start * sin(pi / 4);
+    plot([0 l_start_x1], [0 l_start_y1]);
+    l_end_x0 =  tmp_x_list(end-1) + l_start_x1;
+    l_end_x1 =  tmp_x_list(end-1) + l_start_x1 -l_end*sin(pi/4);
+    l_end_y0 = tmp_y_list(end-1) + l_start_y1;
+    l_end_y1 = tmp_y_list(end-1) + l_start_y1 +l_end*sin(pi/4);
+    plot([l_end_x0 l_end_x1], [l_end_y0 l_end_y1]);
+    hold off;
+
+        
 
 end
 
-if ~is_dia_mode
-    xlim([-90 270]);
-    ylim([-90 270]);
+fprintf('dist = (%0.8f, %0.8f)\r\n', l_start, l_end);
+
+if turn_mode == Dia180
+    xlim([-270 180]);
+    ylim([-90 320]);
+    hold on;
+
+    plot([-270 270], [0 0], 'k:');
+    plot([-270 270], [180 180], 'k:');
+
+    plot([0 0], [-90 270], 'k:');
+    plot([180 180], [-90 270], 'k:');
+
+    plot([-90 -90], [-180 270], 'k:');
+    plot([90 90], [-180 270], 'k:');
+
+    plot([-90 360], [-90 360], 'k:');
+    plot([-90 270], [270 -90], 'k:');
+
+    plot([-360 -90], [0 270], 'k:');
+
+    plot([-180 6], [84 84], 'r:');
+    plot([-180 6], [96 96], 'r:');
+
+    plot([6 6], [84 96], 'r:');
+
+    plot([174 174], [-90 270], 'r:');
+    plot([186 186], [-90 270], 'r:');
+
+    plot([-90 270], [264 264], 'r:');
+    plot([-90 270], [276 276], 'r:');
+
+    hold off;
+elseif ~is_dia_mode
+    xlim([-90 320]);
+    ylim([-90 320]);
     hold on;
 
     plot([-90 270], [0 0], 'k:');
@@ -163,10 +282,10 @@ else
     hold off;
 end
 
-figure(2);
-plot(tmp_w_list)
-xlim([-5 size(tmp_w_list, 1) * 1.1]);
-ylim([-5 max(tmp_w_list) * 1.1]);
+%figure(2);
+%plot(tmp_w_list)
+%xlim([-5 size(tmp_w_list, 1) * 1.1]);
+%ylim([-5 max(tmp_w_list) * 1.1]);
 tmp_w_size = size(tmp_w_list, 1);
 
 search_mode = 0;

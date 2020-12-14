@@ -322,7 +322,7 @@ char runForWallOff2(float vmax, float ACC, float dist, char control, char type,
 		char dir);
 char runForWallforNormalOff(float vmax, float ACC, float dist, char control);
 
-char slalom(char dir, char type, float Velocity, float vel2, float ac) {
+char napier_slalom(char dir, char type, float Velocity, float vel2, float ac) {
 	float radius = getRadius(type, dir);
 	float rad = toRadians(getTargetAngle(type));
 	float time = getNaiperTime(type, dir);
@@ -395,6 +395,8 @@ char slalom(char dir, char type, float Velocity, float vel2, float ac) {
 	ego_data_in.state = 0;
 	ego_data_in.img_ang = 0;
 	ego_data_in.img_dist = 0;
+	distance = img_distance = 0;
+
 	mpc_tgt_calc_mode = 1;
 
 	while (1) {
@@ -457,6 +459,151 @@ char slalom(char dir, char type, float Velocity, float vel2, float ac) {
 	alpha = 0;
 	W_now = 0;
 	return returnStatus;
+}
+
+char normal_slalom(char dir, char type, float Velocity, float vel2, float ac) {
+	float radius = getRadius(type, dir);
+	float rad = toRadians(getTargetAngle(type));
+	float time = getNaiperTime(type, dir);
+	etN = getNaiperN(type);
+	w_now = W_now = 0;
+	cc = 1;
+
+	if (dir == R) {
+		G.th = gyroTh_R;
+		motionDir = R;
+	} else {
+		G.th = gyroTh_L;
+		motionDir = L;
+	}
+	if (type == Normal) {
+		frontCtrl();
+	}
+	globalState = SLA_BEFORE;
+	if (!globalSkipFront) {
+		if (dia == 0) {
+			if (type == Dia45) {
+				if (!running(Velocity, 0, getFrontDistance(type, dir), 1)) {
+					return 0;
+				}
+			} else {
+				if (!running(Velocity, 0, getFrontDistance(type, dir), 1)) {
+					return 0;
+				}
+			}
+		} else {
+			if (!running(Velocity, 0, getFrontDistance(type, dir), 0)) {
+				return 0;
+			}
+		}
+	}
+	globalSkipFront = false;
+
+	rotate_r = rotate_l = true;
+	friction_str = true;
+	friction_roll = true;
+	sinCount = 0;
+	readGyroParam();
+	readAngleParam();
+	sinCount = 1;
+	alphaMode = 1;
+	alphaTemp = ((dir == R) ? -1 : 1)
+			* (2 * Velocity * Velocity / (radius * radius * rad / 2));
+
+	slaTerm = time;
+	globalState = SLA_TURN;
+
+	px = py = 0;
+
+	target_data.alpha = alphaTemp;
+	target_data.end_w = 0;
+	target_data.tgt_angle = rad;
+	target_data.w_max = 10000;
+	mpc_tgt_calc_mode = 4;
+
+	ego_data_in.state = 0;
+	ego_data_in.img_ang = 0;
+	ego_data_in.img_dist = 0;
+	distance = img_distance = 0;
+
+	while (1) {
+//		if (ABS(distance) >= ABS(radius*rad)){
+		if (ego_data_out.pivot_state == 3) {
+			ego_data_in.w = 0;
+			break;
+		}
+	
+		if (ego_data_out.img_dist >= rad*radius) {
+			ego_data_in.w = 0;
+			break;
+		}
+		if (ABS(ego_data_out.img_ang)+0.001 >= ABS(rad)) {
+			ego_data_in.w = 0;
+			break;
+		}
+		if (!fail) {
+			positionControlValueFlg = 0;
+			runFlg = 0;
+			return 0;
+		}
+		if (type != Dia90) {
+			if (!fail) {
+				alphaMode = 0;
+				alphaTemp = 0;
+				slaTerm = 0;
+				omegaTemp = 0;
+				return 0;
+			}
+		}
+	}
+
+	px2 = px;
+	py2 = py;
+
+	fail = 1;
+	if (dia == 0 && (type == Dia45 || type == Dia135)) {
+		dia = 1;
+	} else if (dia == 1 && (type == Dia45 || type == Dia135)) {
+		dia = 0;
+	}
+
+	if (dir == L) {
+		angle -= rad;
+		ang -= rad;
+	} else {
+		angle += rad;
+		ang += rad;
+	}
+
+	globalState = SLA_AFTER;
+	float back = getBackDist(type, dir);
+	char returnStatus = true;
+//	return 1;
+	if (dia == 0) {
+		if (type == Normal && getBackDist(type, dir) > 25) {
+			returnStatus = runForWallforNormalOff(vel2, ac, back, true);
+		} else if (type == Dia45 || type == Dia135) {
+			returnStatus = runForWallOff2(vel2, ac, back, true, type, dir);
+		} else {
+			returnStatus = runForWallOff2(vel2, ac, back, true, type, dir);
+		}
+	} else {
+		returnStatus = runForWallOff2(vel2, ac, back, false, type, dir);
+	}
+	resetAngleParam();
+	cc = 0;
+	alpha = 0;
+	W_now = 0;
+	return returnStatus;
+}
+
+char slalom(char dir, char type, float Velocity, float vel2, float ac) {
+	char n = (char) getNaiperN(type);
+	if ((n & 0x01) == 1) {
+		return normal_slalom(dir, type, Velocity, vel2, ac);
+	} else {
+		return napier_slalom(dir, type, Velocity, vel2, ac);
+	}
 }
 
 void front(float vmax, float ACC, float dist, char control) {
@@ -725,9 +872,6 @@ char orignalRun(float v1, float v2, float ac, float diac, float dist,
 	char bool2 = RS_SEN2.now > search_wall_off_r; // checkSensorOff(R, false);
 	char bool3 = LS_SEN2.now > search_wall_off_l; // checkSensorOff(L, false);
 	char bool4 = bool2 | bool3;
-	const float accelMode = *(float *) 1050040;
-	const float accelModechangeVelcoity = *(float *) 1050044;
-	const float exrp = *(float *) 1049544;
 
 	target_data.accl = ac;
 	target_data.alpha = 0;
@@ -743,6 +887,11 @@ char orignalRun(float v1, float v2, float ac, float diac, float dist,
 	ego_data_in.img_ang = 0;
 	ego_data_in.img_dist = 0;
 	mpc_tgt_calc_mode = (int32_T) ST_RUN;
+
+	target_data.limit_accl_ratio_cnt = accl_delay_max_cnt;
+	target_data.limit_decel_ratio_cnt = decel_delay_max_cnt;
+	ego_data_in.cnt_delay_accl_ratio = 0;
+	ego_data_in.cnt_delay_decel_ratio = 0;
 
 	while (true) {
 		if ((ABS(distance) >= ABS(dist))) {
@@ -814,7 +963,6 @@ char calibrateRun(char RorL) {
 	float v1 = *(float *) 1050000;
 	float ac = *(float *) 1050004;
 
-	const float dist = *(float *) 1050008;
 	const float dist2 = *(float *) 1050012;
 
 	cmt_wait(200);

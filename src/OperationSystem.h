@@ -325,6 +325,7 @@ void testSlalom3() {
 	testRunMode = true;
 	slalom(RorL, type, vMax, vMax, 0);
 
+
 	gyroErrResetEnable = true;
 	// Sen.Kp = *(float *) 1049376;
 	// Sen.Ki = *(float *) 1049380;
@@ -404,7 +405,10 @@ void testNormalSlalom() {
 	save_high_param();
 
 	testRunMode = true;
-
+	logs = 0;
+	time = 0;
+	cc = 1;
+	logs = 0;
 	if (test_front_ctrl) {
 		realRun(vMax, accele, diaccele, 180.0 * 1, vMax, NULL_FILTER);
 		frontCtrl();
@@ -420,10 +424,6 @@ void testNormalSlalom() {
 			realRun(vMax, accele, diaccele, 180.0 * 1, vMax, NULL_FILTER);
 		}
 
-		logs = 0;
-		time = 0;
-		cc = 1;
-		logs = 0;
 		slalom(RorL, Normal, vMax, vMax, 0);
 //		slalom(RorL, Normal, vMax, vMax, 0);
 

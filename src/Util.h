@@ -887,10 +887,6 @@ int direction(int Dir, int SLRB) {
 	}
 	return Dir;
 }
-void waitforprint() {
-	for (int i = 0; 1024; i++)
-		;
-}
 
 void logOutPut() {
 	globalState = PIVOT;
@@ -904,7 +900,7 @@ void logOutPut() {
 	cmt_wait(1);
 	myprintf("img_distance,C.angles,img_ang,img_dist\r\n");
 	cmt_wait(1);
-	float wait_time = 0.0025;
+	float wait_time = 0.005;
 	for (c = 0; c < L_Length; c++) {
 		myprintf("%d,%f,%f,%f", c, log1[c], log3[c], log4[c]);
 		cmt_wait(wait_time);

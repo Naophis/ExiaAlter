@@ -54,9 +54,11 @@ typedef struct
     float tgt_angle;
     // t_trajectory_point trajectory_point[TRAJECTORY_POINT_SIZE];
     int trajectory_point_size;
-    // t_kanayama_gain kanayama_gain;
+    t_kanayama_gain kanayama_gain;
     t_accl_param accl_param;
     float slip_gain;
+    float limit_accl_ratio_cnt;
+    float limit_decel_ratio_cnt;
 } t_tgt;
 
 typedef struct
@@ -96,6 +98,10 @@ typedef struct
     t_point slip_point;
     t_kanayama_tgt_point kanayama_point;
     t_trajectory_diff trj_diff;
+    float delay_accl;
+    float delay_v;
+    float cnt_delay_accl_ratio;
+    float cnt_delay_decel_ratio;
 } t_ego;
 
 typedef struct
@@ -136,7 +142,8 @@ typedef struct
     float R90;
     char turn_mode;
     char is_dia;
-} t_wall_off_input;
+    float front_dist;
+} t_wall_sensor_input;
 
 typedef struct
 {
@@ -145,11 +152,6 @@ typedef struct
     float th_R45;
     float th_L90;
     float th_R90;
-} t_wall_off_th;
-
-typedef struct
-{
-    float front_dist;
 } t_wall_off_th;
 
 #endif

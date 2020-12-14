@@ -1,13 +1,13 @@
-function [x, y, w, theta, idx] = detect_trj_point(ego, tgt)
+function [x, y, w, theta, idx] = detect_trj_point(ego, tgt, mode)
     dist = ego.dist;
-    trj_shape=tgt.trajectory_point;
-    trj_shape_size=tgt.trajectory_point_size;
+    trj_shape = tgt.trajectory_point;
+    trj_shape_size = tgt.trajectory_point_size;
     x = single(0);
     y = single(0);
     w = single(0);
     theta = single(0);
     idx = int32(1);
-    
+
     if dist < 0
         return;
     end
@@ -41,8 +41,8 @@ function [x, y, w, theta, idx] = detect_trj_point(ego, tgt)
     idx_1 = tgt_idx - int32(1);
     idx_2 = tgt_idx;
 
-    if idx_1 ==0
-        return ;
+    if idx_1 == 0
+        return;
     end
 
     point_1 = trj_shape(idx_1);

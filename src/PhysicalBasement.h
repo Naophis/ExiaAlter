@@ -365,8 +365,6 @@ float check_sen_error_dia_side_v2(void) {
 
 	char flag45 = false;
 	if (diaStrwallCount_r > 0) {
-//		float tmpRightRef = sen_r_dia_img[(int) (img_dist_r)];
-//		float tmpRightRef90 = sen_r90_dia[(int) (img_dist_r)];
 		float tmpRightRef = getLerpValue(img_dist_r, sen_r_dia_img,
 				sizeof(sen_r_dia_img));
 		float tmpRightRef90 = getLerpValue(img_dist_r, sen_r90_dia,
@@ -387,8 +385,6 @@ float check_sen_error_dia_side_v2(void) {
 		}
 	}
 	if (diaStrwallCount_l > 0) {
-//		float tmpLeftRef = sen_l_dia_img[(int) (img_dist_l)];
-//		float tmpLeftRef90 = sen_l90_dia[(int) (img_dist_l)];
 		float tmpLeftRef = getLerpValue(img_dist_l, sen_l_dia_img,
 				sizeof(sen_l_dia_img));
 		float tmpLeftRef90 = getLerpValue(img_dist_l, sen_l90_dia,
@@ -922,10 +918,6 @@ void dutyCalcuration2(void) {
 		GPT0.GTCCRA = GPT0.GTCCRC = GPT1.GTCCRA = GPT1.GTCCRC = 0;
 	}
 }
-void mpc_tgt_calc_step(RT_MODEL_mpc_tgt_calc_T * const mpc_tgt_calc_M,
-		t_tgt *mpc_tgt_calc_U_tgt, t_ego *mpc_tgt_calc_U_ego,
-		int32_T mpc_tgt_calc_U_mode, t_ego *mpc_tgt_calc_Y_Out1);
-
 //物理量ベース計算
 void Physical_Basement(void) {
 	enc_r = MTU1.TCNT - 30000;
@@ -969,7 +961,6 @@ void Physical_Basement(void) {
 	mpc_tgt_calc_step(&mpc_tgt_calc_error_status, &target_data, &ego_data_in,
 			mpc_tgt_calc_mode, 1, &ego_data_out);
 
-
 	int predict_time = (int) (*(float *) 1050428);
 	if (predict_time < 1) {
 		predict_time = 1;
@@ -1010,10 +1001,14 @@ void Physical_Basement(void) {
 	angle = ego_data_out.ang;
 	img_distance = ego_data_in.dist;
 
-	tgt_v_now_ff = ego_data_out2.v;
+//	tgt_v_now_ff = ego_data_out2.v;
+	tgt_v_now_ff = ego_data_out.delay_v;
 	tgt_w_now_ff = ego_data_out2.w;
-	tgt_accl_ff = ego_data_out2.accl;
+	tgt_accl_ff = ego_data_out.delay_accl; //ratio
 	tgt_alpha_ff = ego_data_out2.alpha;
+
+	ego_data_in.cnt_delay_accl_ratio = ego_data_out.cnt_delay_accl_ratio;
+	ego_data_in.cnt_delay_decel_ratio = ego_data_out.cnt_delay_decel_ratio;
 
 	enc_to_vel();
 	errorVelocity();
