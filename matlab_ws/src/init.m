@@ -12,7 +12,7 @@ Simulink.importExternalCTypes('../include/bus.h');
 dt = 0.001/4;
 
 test_mode = 0; % straight
- test_mode = 1; % slalom
+test_mode = 1; % slalom
 % test_mode = 2; % pivot
 % test_mode = 3; % back_straight
 %test_mode = 4; % back_straight
@@ -37,7 +37,7 @@ k_theta = single(0.0);
 
 accl_param_limit = single(4500);
 accl_param_n = single(16);
-slip_gain = 50;
+slip_gain = 400;
 
 if test_mode == 0
     % tgt
@@ -131,10 +131,7 @@ if test_mode == 1
         tmp_y_list(i) = trajectory_shape_list(i).y;
     end
     
-    
-    
-
-    plot(tmp_x_list, tmp_y_list, '-o');
+    plot(tmp_x_list, tmp_y_list, 'LineWidth', 2);
     xlim([-90 270]);
     ylim([-90 270]);
     hold on;
