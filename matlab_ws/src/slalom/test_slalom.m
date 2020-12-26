@@ -2,11 +2,12 @@
 dt = 0.001/4;
 Large = 1; Orval = 2; Dia45 = 3; Dia135 = 4; Dia90 = 5; Dia180 = 6;
 
-ego_v = 2000;
-turn_mode = Dia135;
+ego_v = 1500;
+turn_mode = Large;
 
 is_dia_mode = false;
-slip_gain = 150;
+slip_gain = -495;
+
 wall_off_offset = 6;
 wall_off_offset_dia = 6 * sqrt(2);
 
@@ -113,8 +114,12 @@ end
 G = 9.81;
 fprintf('pos(x,y,rad,deg,max_G) = (%0.8f, %0.8f, %0.8f, %0.8f, %0.8fG)\r\n', tmp_x, tmp_y, tmp_theta, tmp_theta * 180 / pi, max(tmp_w_list)^2 * (radius / 1000) / G);
 
-plot_slalom(turn_mode, tmp_x_list, tmp_y_list, tmp_w_list, tmp_x, tmp_y, target_angle, is_dia_mode, 1, wall_off_offset, wall_off_offset_dia);
-[l_start, l_end] = plot_slalom(turn_mode, tmp_slip_x_list, tmp_slip_y_list, tmp_w_list, tmp_x, tmp_y, target_angle, is_dia_mode, 2, wall_off_offset, wall_off_offset_dia);
+[a,b]=plot_slalom(turn_mode, tmp_x_list, tmp_y_list, tmp_w_list, tmp_x, tmp_y, target_angle, is_dia_mode, 'normal', wall_off_offset, wall_off_offset_dia);
+
+
+fprintf('no_slip %0.8f\t%0.8f\r\n', ...
+    a, b);
+[l_start, l_end] = plot_slalom(turn_mode, tmp_slip_x_list, tmp_slip_y_list, tmp_w_list, tmp_x, tmp_y, target_angle, is_dia_mode, 'slip', wall_off_offset, wall_off_offset_dia);
 
 fprintf('%d\t%s\t', ...
     ego_v, turn_mode_str);

@@ -2,7 +2,7 @@ function [l_start, l_end] = plot_slalom(turn_mode, tmp_x_list, tmp_y_list, tmp_w
         tmp_x, tmp_y, target_angle, is_dia_mode, fig_num, wall_off_offset, wall_off_offset_dia)
     Large = 1; Orval = 2; Dia45 = 3; Dia135 = 4; Dia90 = 5; Dia180 = 6;
     output = 0;
-    fig1 = figure(fig_num);
+    fig1 = figure('Name',fig_num);
     clf(fig1);
     l_start = 0;
     l_end = 0;
